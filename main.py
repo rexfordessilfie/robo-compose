@@ -10,10 +10,8 @@ class KeySignature:
         self.mode = mode
 
     def get_scale(self):
-        scale_factory = scales.ScaleFactory()
-        scale_pitches = scale_factory.get_scale(self.pitch.get_frequency(),
-                                                self.mode)
-        return scale_pitches
+        return scales.ScaleFactory.get_scale(self.pitch.get_frequency(),
+                                             self.mode)
 
 
 class Pitch:
