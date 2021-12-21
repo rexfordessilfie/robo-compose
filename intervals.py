@@ -7,12 +7,6 @@ class Interval:
         self.value = value
         self.inverse = 1/value
 
-    def __add__(self, other: object):
-        if isinstance(other, Interval):
-            return self.value + other.value
-
-        return self.value + other
-
     def __str__(self):
         return f'Interval:{self.value}'
 
@@ -25,14 +19,21 @@ class Interval:
 
         return self.value == other
 
-    def __mul__(self, other):
+    def __add__(self, other: object):
         if isinstance(other, Interval):
-            return self.value * other.value
+            return Interval(self.value + other.value)
 
-        return self.value * other
+        return Interval(self.value + other)
+
+    def __mul__(self, other: object):
+        if isinstance(other, Interval):
+            return Interval(self.value * other.value)
+
+        return Interval(self.value * other)
 
     # reverse multiplication same as __mul__, so that: a * interval = interval * a
     __rmul__ = __mul__
+
 
 # Interval Definitions
 
@@ -68,3 +69,23 @@ class EqualTemperament():
 
     TONE = MAJOR_SECOND
     SEMITONE = MINOR_SECOND
+
+    @classmethod
+    def sharpen(cls, interval: Interval = None, frequency: int = None, count: int = 1):
+        final_interval = Interval(cls.base**count)
+
+        if interval:
+            return interval + final_interval
+
+        if frequency:
+            return frequency * final_interval.value
+
+    @classmethod
+    def flatten(cls, interval: Interval = None, frequency: int = None, count: int = 1):
+        final_interval = Interval(cls.base**count)
+
+        if interval:
+            return interval - final_interval
+
+        if frequency:
+            return frequency * final_interval.inverse
