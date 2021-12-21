@@ -99,10 +99,10 @@ class ChordFactory:
             filter(None, re.split(extension_regex, extension_str)))
 
         def get_interval_from_extension_quality(q: str):
-            # TODO: add support for aliases to allow writing chords with b13, #11 etc.
-            _q = q.replace('#', 'A').replace('b', 'D')
+            # TODO: add support for aliases to allow writing chords with extensions like b13, #11 etc.
+            # _q = q.replace('#4', 'A4').replace('b5', 'D4')
             try:
-                return getattr(et, _q)
+                return getattr(et, q)
             except AttributeError:
                 raise AttributeError('unrecognized interval quality')
 
