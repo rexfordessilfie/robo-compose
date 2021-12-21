@@ -1,16 +1,19 @@
 import math
 
+
 class Interval:
     def __init__(self, value):
         self.value = value
+        self.inverse = 1/value
 
     def __add__(self, other):
         return self.value + other.value
 
     def __str__(self):
-        return f'Interval: {self.value}'        
+        return f'Interval: {self.value}'
 
 # Interval Definitions
+
 
 class EqualTemperament:
     base = 2**(1/12)
@@ -41,4 +44,3 @@ class EqualTemperament:
 
     TONE = MAJOR_SECOND
     SEMITONE = MINOR_SECOND
-

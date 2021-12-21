@@ -1,6 +1,7 @@
 import math
 import scales
 import random
+from intervals import Interval
 
 
 class KeySignature:
@@ -18,16 +19,20 @@ class KeySignature:
 class Pitch:
     def __init__(
             self,
-            frequency=0,
-            pitch_class='',
-            accidental='natural',
-            register=-1):
+
+            # directly identify pitch via frequency
+            frequency=None,
+
+            # other info for identifying a pitch
+            pitch_class=None,
+            accidental=None,
+            register=None):
         '''TODO: be able to derive a pitch name from its frequency and vice versa'''
         self.frequency = frequency
 
     def __str__(self):
         return f"Pitch: {self.frequency}"
-        # return f"{self.pitch_class}{self.accidental}{self.register}({self.frequency})"
+        # return f"Pitch: {self.pitch_class}{self.accidental}{self.register}({self.frequency})"
 
     def get_frequency(self):
         return self.frequency
@@ -50,6 +55,18 @@ class Pitch:
             return scale[random_index]
         else:
             print('Key Signature is invalid')
+
+    def has_same_pitch_class(self, pitch) -> bool:
+        '''Two pitches are the same pitch class if one frequency can be expressed as the original frequency times a power of 2'''
+        interval_between_pitches = self.frequency / \
+            pitch.frequency if self.frequency > pitch.frequency else pitch.frequency / self.frequency
+        interval_to_base_2 = math.log(interval_between_pitches, 2)
+        remainder = interval_to_base_2 % 1
+
+        return remainder == 0
+
+    def get_pitch_interval_away(self, interval: Interval):
+        return Pitch(self.frequency * interval.value)
 
 
 class Duration:
