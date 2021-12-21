@@ -75,7 +75,7 @@ class EqualTemperament():
         final_interval = Interval(cls.base**count)
 
         if interval:
-            return interval + final_interval
+            return interval * final_interval
 
         if frequency:
             return frequency * final_interval.value
@@ -85,7 +85,7 @@ class EqualTemperament():
         final_interval = Interval(cls.base**count)
 
         if interval:
-            return interval - final_interval
+            return interval * final_interval.inverse
 
         if frequency:
             return frequency * final_interval.inverse
