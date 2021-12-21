@@ -1,31 +1,32 @@
-from intervals import EqualTemperament as et
+from typing import List
+from intervals import EqualTemperament as et, Interval
 
 
-class IntervalsRelatedToStartFrequency:
+class ScaleIntervalsRelatedToStartFrequency:
     MAJOR = [
-        et.UNISON.value, et.MAJOR_SECOND.value, et.MAJOR_THIRD.value,
-        et.PERFECT_FOURTH.value, et.PERFECT_FIFTH.value, et.MAJOR_SIXTH.value,
-        et.MAJOR_SEVENTH.value, et.OCTAVE.value
+        et.UNISON, et.MAJOR_SECOND, et.MAJOR_THIRD,
+        et.PERFECT_FOURTH, et.PERFECT_FIFTH, et.MAJOR_SIXTH,
+        et.MAJOR_SEVENTH, et.OCTAVE
     ]
 
     MINOR = []
 
 
-class IntervalsRelatedToNextNote:
+class ScaleIntervalsRelatedToNextNote:
     CHROMATIC = [
-        et.UNISON.value, et.SEMITONE.value, et.SEMITONE.value,
-        et.SEMITONE.value, et.SEMITONE.value, et.SEMITONE.value,
-        et.SEMITONE.value, et.SEMITONE.value, et.SEMITONE.value,
-        et.SEMITONE.value, et.SEMITONE.value, et.SEMITONE.value,
-        et.SEMITONE.value
+        et.UNISON, et.SEMITONE, et.SEMITONE,
+        et.SEMITONE, et.SEMITONE, et.SEMITONE,
+        et.SEMITONE, et.SEMITONE, et.SEMITONE,
+        et.SEMITONE, et.SEMITONE, et.SEMITONE,
+        et.SEMITONE
     ]
 
 
 class ScaleBuilder:
     def __init__(
         self,
-        interval_list=[],
-        frequency_list=[],
+        interval_list: List[Interval] = [],
+        frequency_list: List[int] = [],
         intervals_relative_to_start=False,
         intervals_relative_to_next=False,
     ):
@@ -34,7 +35,10 @@ class ScaleBuilder:
         self.intervals_relative_to_next = intervals_relative_to_next
         self.frequency_list = frequency_list
 
-    def build(self, start_frequency):
+    def extend_interval_list(self, intervals: List[Interval]):
+        self.interval_list.extend(intervals)
+
+    def build(self, start_frequency: int) -> List[int]:
         use_frequencies = len(self.frequency_list)
         use_intervals = len(self.interval_list)
 
@@ -51,40 +55,46 @@ class ScaleBuilder:
                 scale = []
                 current_frequency = start_frequency
                 for interval in self.interval_list:
-                    next_interval = current_frequency * interval
-                    scale.append(next_interval)
-                    current_frequency = next_interval
+                    next_frequency = current_frequency * interval
+                    scale.append(next_frequency)
+                    current_frequency = next_frequency
                 return scale
 
 
 class ScaleFactory:
     '''Exposes functions to get a scale builder or to build a scale and return it. '''
     MajorScaleBuilder = ScaleBuilder(
-        interval_list=IntervalsRelatedToStartFrequency.MAJOR,
+        interval_list=ScaleIntervalsRelatedToStartFrequency.MAJOR,
         intervals_relative_to_start=True)
 
     MinorScaleBuilder = ScaleBuilder(
-        interval_list=IntervalsRelatedToStartFrequency.MINOR,
+        interval_list=ScaleIntervalsRelatedToStartFrequency.MINOR,
         intervals_relative_to_start=True)
 
     ChromaticScaleBuilder = ScaleBuilder(
-        interval_list=IntervalsRelatedToNextNote.CHROMATIC,
+        interval_list=ScaleIntervalsRelatedToNextNote.CHROMATIC,
         intervals_relative_to_next=True)
 
     def __init__(self):
         pass
 
-    def get_scale_builder(self, mode):
+    @classmethod
+    def get_scale_builder(cls, mode) -> ScaleBuilder:
         if (mode == "major"):
-            return self.MajorScaleBuilder
+            return cls.MajorScaleBuilder
 
         if (mode == "minor"):
-            return self.MinorScaleBuilder
+            return cls.MinorScaleBuilder
 
         if (mode == "chromatic"):
-            return self.ChromaticScaleBuilder
+            return cls.ChromaticScaleBuilder
 
-    def get_scale(self, start_frequency, mode):
-        scale_builder = self.get_scale_builder(mode)
+    @classmethod
+    def get_scale(cls, start_frequency, mode) -> List[int]:
+        scale_builder = cls.get_scale_builder(mode)
         scale = scale_builder.build(start_frequency)
         return scale
+
+
+if __name__ == '__main__':
+    print(ScaleFactory.get_scale(440, 'chromatic'))
