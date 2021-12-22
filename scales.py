@@ -38,7 +38,7 @@ class ScaleBuilder:
     def extend_interval_list(self, intervals: List[Interval]):
         self.interval_list.extend(intervals)
 
-    def build(self, start_frequency: int) -> List[int]:
+    def build(self, start_frequency: int) -> List[float]:
         use_frequencies = len(self.frequency_list)
         use_intervals = len(self.interval_list)
 

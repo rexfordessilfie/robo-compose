@@ -23,13 +23,13 @@ class Interval:
         if isinstance(other, Interval):
             return Interval(self.value + other.value)
 
-        return Interval(self.value + other)
+        return self.value + other
 
     def __mul__(self, other: object):
         if isinstance(other, Interval):
             return Interval(self.value * other.value)
 
-        return Interval(self.value * other)
+        return self.value * other
 
     # reverse multiplication same as __mul__, so that: a * interval = interval * a
     __rmul__ = __mul__
