@@ -50,7 +50,7 @@ class Pitch:
         if key and isinstance(key, KeySignature):
             scale = key.get_scale()
             random_index = random.randrange(0, len(scale))
-            return scale[random_index]
+            return Pitch(frequency=scale[random_index])
         else:
             print('Key Signature is invalid')
 
@@ -75,7 +75,7 @@ class Duration:
     @staticmethod
     def get_random(max_duration=math.inf, quantized=False, bpm=None):
         '''TODO: get a random duration and return it. If quantized then return something that aligns to a specific division of the beat or bpm. Consider time signature??'''
-        pass
+        return random.random() * 1  # fraction of 1 second
 
 
 class Note:
@@ -95,4 +95,4 @@ class Note:
         new_duration = Duration.get_random(max_duration=max_duration,
                                            quantized=quantized,
                                            bpm=bpm)
-        return Note(new_pitch, new_duration)
+        return Note(pitch=new_pitch, duration=new_duration)
