@@ -113,6 +113,7 @@ class ChordFactory:
         # TODO: maybe add the extensions as an argument to the build command?
         chord_builder.extend_interval_list(extension_intervals)
         chord = chord_builder.build(root_frequency)
+        chord.sort()
         return chord
 
 
