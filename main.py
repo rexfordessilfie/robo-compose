@@ -83,6 +83,9 @@ class Note:
         self.pitch = pitch
         self.duration = duration
 
+    def __repr__(self) -> str:
+        return f"Note<{self.pitch},{self.duration}>"
+
     def get_frequency(self):
         return self.pitch.get_frequency()
 
