@@ -4,14 +4,40 @@ import random
 from intervals import Interval
 
 
+class Accidental:
+    SHARP = 'sharp'
+    NATURAL = 'natural'
+    FLAT = 'flat'
+
+
+class PitchClass:
+    A = 'A'
+    B = 'B'
+    C = 'C'
+    D = 'D'
+    E = 'E'
+    F = 'F'
+    G = 'G'
+
+    @classmethod
+    def get_list(cls, start: str = None):
+        default = [cls.A, cls.B, cls.C, cls.D, cls.E, cls.F, cls.G]
+
+        if start:
+            start_idx = default.index(start)
+            return default[start_idx:] + default[:start_idx]
+        else:
+            return default
+
+
 class KeySignature:
     def __init__(self, pitch, mode):
         self.pitch = pitch
         self.mode = mode
 
     def get_scale(self):
-        return scales.ScaleFactory.get_scale(self.pitch.get_frequency(),
-                                             self.mode)
+        return list(map(Pitch, scales.ScaleFactory.get_scale(self.pitch.get_frequency(),
+                                                             self.mode)))
 
 
 class Pitch:
@@ -23,14 +49,23 @@ class Pitch:
 
             # other info for identifying a pitch
             pitch_class=None,
-            accidental=None,
-            register=None):
+            accidental=Accidental.NATURAL,
+            register=4,
+
+            # enharmonic pitch classses
+            enharmonic_pitch_class=None,
+            enharmonic_accidental=None,
+    ):
         '''TODO: be able to derive a pitch name from its frequency and vice versa'''
         self.frequency = frequency
+        self.pitch_class = pitch_class
+        self.accidental = accidental
+        self.register = register
+        self.enharmonic_pitch_class = enharmonic_pitch_class
+        self.enharmonic_accidental = enharmonic_accidental
 
     def __str__(self):
-        return f"Pitch: {self.frequency}"
-        # return f"Pitch: {self.pitch_class}{self.accidental}{self.register}({self.frequency})"
+        return f"Pitch<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
 
     def get_frequency(self):
         return self.frequency
@@ -99,3 +134,7 @@ class Note:
                                            quantized=quantized,
                                            bpm=bpm)
         return Note(pitch=new_pitch, duration=new_duration)
+
+
+if __name__ == '__main__':
+    print(PitchClass.get_list(start=PitchClass.E))
