@@ -1,8 +1,6 @@
 from typing import List, Union
-from chords import ChordFactory
-from main import KeySignature, Note, Pitch
-from intervals import EqualTemperament as et
-import time
+from main import Note, Pitch
+
 
 from synthesizer import Player as Player, Synthesizer, Waveform
 
@@ -64,47 +62,3 @@ class Tone:
     def play_progression(cls, chords: List[List[Union[float, Pitch]]] = None, duration: float = 1):
         for i in range(len(chords)):
             cls.play_chord(chords[i])
-
-
-def song1(bars=4):
-    chord = ChordFactory.get_chord(440, 'MM7M6')
-    for _ in range(bars):
-        Tone.play_progression(
-            [chord,
-             map(et.sharpen, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord)])
-        time.sleep(0.005)
-
-
-def song2(bars=4):
-    chord1 = ChordFactory.get_chord(440, 'M')
-    chord2 = ChordFactory.get_chord(440 * et.P4, 'M')
-    chord3 = ChordFactory.get_chord(440 * et.P5, 'M')
-
-    for _ in range(bars):
-        Tone.play_progression(
-            [chord1,
-             chord1,
-             chord2,
-             chord3])
-        time.sleep(0.005)
-
-
-def song3(bars=4):
-    num_notes = 8
-    random_notes = [
-        Note.get_random(
-            key=KeySignature(pitch=Pitch(frequency=440), mode='chromatic')) for _ in range(num_notes)]
-
-    for _ in range(bars):
-        Tone.play_melody(random_notes)
-
-
-if __name__ == '__main__':
-    # song1(1)
-    # song2(1)
-    song3()
-    pass
