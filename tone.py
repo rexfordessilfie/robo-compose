@@ -21,7 +21,7 @@ class Tone:
     # TODO: move these to an outside utility file?
     @classmethod
     def get_frequency(cls, o: Union[float, Pitch, Note]):
-        return o if isinstance(o, float) \
+        return o if isinstance(o, float) or isinstance(o, int) \
             else o.frequency if isinstance(o, Pitch) \
             else o.pitch.frequency if isinstance(o, Note) \
             else None
