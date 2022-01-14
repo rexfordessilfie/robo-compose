@@ -19,6 +19,7 @@ class Interval:
 
         return self.value == other
 
+    # TODO: reconsider what it means to add an interval. Truly increasing an interval by x amount constitutes multiplying it
     def __add__(self, other: object):
         if isinstance(other, Interval):
             return Interval(self.value + other.value)
