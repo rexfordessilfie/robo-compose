@@ -4,8 +4,8 @@ from sre_constants import error
 
 class Interval:
     def __init__(self, value: float):
-        self.value = value
-        self.inverse = 1/value
+        self.value = float(value)
+        self.inverse = float(1/value)
 
     def __str__(self):
         return f'Interval:{self.value}'
@@ -54,7 +54,7 @@ class EqualTemperament():
     PERFECT_FOURTH = P4 = Interval(base**5)
 
     TRITONE = Interval(base**6)
-    DIMINISHED_FIFTH = D4 = TRITONE
+    DIMINISHED_FIFTH = D5 = TRITONE
     AUGMENTED_FOURTH = A4 = TRITONE
 
     PERFECT_FIFTH = P5 = Interval(base**7)
@@ -83,6 +83,56 @@ class EqualTemperament():
     @classmethod
     def flatten(cls, interval: Interval = None, frequency: int = None, count: int = 1):
         final_interval = Interval(cls.base**count)
+
+        if interval:
+            return interval * final_interval.inverse
+
+        if frequency:
+            return frequency * final_interval.inverse
+
+
+class JustIntonation():
+
+    UNISON = Interval(1)
+
+    MINOR_SECOND = m2 = Interval(25/24)
+    MAJOR_SECOND = M2 = Interval(9/8)
+
+    MINOR_THIRD = m3 = Interval(6/5)
+    MAJOR_THIRD = M3 = Interval(5/4)
+
+    PERFECT_FOURTH = P4 = Interval(4/3)
+
+    TRITONE = Interval(45/32)
+    DIMINISHED_FIFTH = D5 = TRITONE
+    AUGMENTED_FOURTH = A4 = TRITONE
+
+    PERFECT_FIFTH = P5 = Interval(3/2)
+
+    MINOR_SIXTH = m6 = Interval(8/5)
+    MAJOR_SIXTH = M6 = Interval(5/3)
+
+    MINOR_SEVENTH = m7 = Interval(9/5)
+    MAJOR_SEVENTH = M7 = Interval(15/8)
+
+    OCTAVE = Interval(2)
+
+    TONE = MAJOR_SECOND
+    SEMITONE = MINOR_SECOND
+
+    @classmethod
+    def sharpen(cls, interval: Interval = None, frequency: int = None, count: int = 1):
+        final_interval = Interval(cls.m2**count)
+
+        if interval:
+            return interval * final_interval
+
+        if frequency:
+            return frequency * final_interval.value
+
+    @classmethod
+    def flatten(cls, interval: Interval = None, frequency: int = None, count: int = 1):
+        final_interval = Interval(cls.m2**count)
 
         if interval:
             return interval * final_interval.inverse
