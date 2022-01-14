@@ -52,6 +52,20 @@ def random_song(bars=4,
         rest()
 
 
+def scale_song(bars=1,
+               mode='major',
+               root_frequency=440,
+               ):
+
+    scale = KeySignature(pitch=Pitch(
+        frequency=root_frequency), mode=mode).get_scale()
+
+    print(scale)
+    for _ in range(bars):
+        Tone.play_melody(scale)
+        rest()
+
+
 if __name__ == '__main__':
     random_song()
     pass
