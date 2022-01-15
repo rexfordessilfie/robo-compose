@@ -23,19 +23,18 @@ class PitchClass:
     F = 'F'
     G = 'G'
 
-    @classmethod
-    def get_list(cls, start: str = None):
-        default = [cls.A, cls.B, cls.C, cls.D, cls.E, cls.F, cls.G]
-
+    @staticmethod
+    def get_list(start: str = None):
+        default = [PitchClass.A, PitchClass.B, PitchClass.C, PitchClass.D, PitchClass.E, PitchClass.F, PitchClass.G]
         if start:
             start_idx = default.index(start)
             return default[start_idx:] + default[:start_idx]
-
         return default
 
 
 @dataclass
 class PitchInfo:
+    # TODO: default register and accidental here to allow for PitchInfo(pitch_class=PitchClass.C).to_pitch() to work?
     frequency: int = None
     pitch_class: str = None
     accidental: str = None
@@ -43,13 +42,17 @@ class PitchInfo:
     enharmonic_pitch_class: str = None
     enharmonic_accidental: str = None
 
+    def swap_enharmonic(self):
+        self.pitch_class, self.enharmonic_pitch_class = self.enharmonic_pitch_class, self.pitch_class
+        self.accidental, self.enharmonic_accidental = self.enharmonic_accidental, self.accidental
+
     def to_pitch(self):
         return Pitch(frequency=self.frequency,
                      pitch_class=self.pitch_class,
                      accidental=self.accidental,
                      register=self.register,
-                     enharmonic_accidental=self.enharmonic_accidental,
-                     enharmonic_pitch_class=self.enharmonic_pitch_class)
+                     enharmonic_pitch_class=self.enharmonic_pitch_class,
+                     enharmonic_accidental=self.enharmonic_accidental)
 
 
 """
@@ -143,22 +146,25 @@ def is_below_octave_range(a: float, b: float):
 
 
 def is_pitch_complete(p: PitchInfo):
-    return p.pitch_class and p.accidental and p.frequency
+    return p.pitch_class and p.accidental and p.frequency and p.register is not None
 
 
-def complete_keyboard_pitch_info():
+def complete_pitches_info():
     for idx, pitch_info in enumerate(CHROMATIC_PITCHES_INFO):
         if is_pitch_complete(pitch_info):
             yield pitch_info, idx
 
 
-def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
-    return (a.pitch_class == b.pitch_class and a.accidental == b.accidental) or \
-           (a.enharmonic_pitch_class == b.pitch_class and a.enharmonic_accidental == b.accidental) or \
+def is_enharmonic_match(a: PitchInfo, b: PitchInfo):
+    return (a.enharmonic_pitch_class == b.pitch_class and a.enharmonic_accidental == b.accidental) or \
            (a.pitch_class == b.enharmonic_pitch_class and a.accidental == b.enharmonic_accidental)
 
 
-def matching_keyboard_pitch_info(p: PitchInfo):
+def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
+    return (a.pitch_class == b.pitch_class and a.accidental == b.accidental) or is_enharmonic_match(a, b)
+
+
+def matching_pitches_info(p: PitchInfo):
     for idx, pitch_info in enumerate(CHROMATIC_PITCHES_INFO):
         if is_matching_pitch_info(p, pitch_info):
             yield pitch_info, idx
@@ -186,17 +192,19 @@ def pitch_info_from_pitch_string(pitch_str: str):
         else Accidental.NATURAL
 
     register = int(register)
+    pitch_info = PitchInfo(pitch_class=pitch_class, accidental=accidental)
 
     matching_chromatic_pitch_info, _ = next(
-        matching_keyboard_pitch_info(PitchInfo(pitch_class=pitch_class, accidental=accidental))
+        matching_pitches_info(pitch_info)
     )
 
-    # TODO: add support for detecting enharmonic match and then swap primary and enharmonic pitch_class and accidental
-    #   e.g if is_enharmonic_match: pitch_info.swap_harmonics
-
     final_pitch_info = copy.deepcopy(matching_chromatic_pitch_info)
+
     final_pitch_info.register = register
     final_pitch_info.frequency = frequency_from_pitch_info(final_pitch_info)
+
+    if is_enharmonic_match(pitch_info, matching_chromatic_pitch_info):
+        final_pitch_info.swap_enharmonic()
 
     return final_pitch_info
 
@@ -205,7 +213,7 @@ def pitch_info_from_frequency(frequency: float):
     """
     Determines the Pitch from frequency
     """
-    reference_pitch, reference_pitch_idx = next(complete_keyboard_pitch_info())
+    reference_pitch, reference_pitch_idx = next(complete_pitches_info())
 
     # how many times and in what direction do we need to reduce/increase octave
     # to normalize to the same octave range
@@ -238,12 +246,12 @@ def pitch_info_from_frequency(frequency: float):
 
 def frequency_from_pitch_info(pitch_info: PitchInfo):
     matching_pitch, matching_pitch_idx = next(
-        matching_keyboard_pitch_info(
+        matching_pitches_info(
             PitchInfo(pitch_class=pitch_info.pitch_class,
                       accidental=pitch_info.accidental))
     )
 
-    reference_pitch, reference_pitch_idx = next(complete_keyboard_pitch_info())
+    reference_pitch, reference_pitch_idx = next(complete_pitches_info())
 
     num_semitones_from_reference = abs(
         matching_pitch_idx - reference_pitch_idx)
@@ -259,22 +267,26 @@ def frequency_from_pitch_info(pitch_info: PitchInfo):
 class Pitch(PitchInfo):
     def __init__(
             self,
-
+            *args,
             frequency=None,
-
-            # pitch info
             pitch_class=None,
             accidental=Accidental.NATURAL,
             register=4,
-
-            # enharmonic info
             enharmonic_pitch_class=None,
             enharmonic_accidental=None,
+            **kwargs
     ):
-        # TODO: give args?
-        super(Pitch, self).__init__()
+        super(Pitch, self).__init__(*args,
+                                    frequency=frequency,
+                                    pitch_class=pitch_class,
+                                    accidental=accidental,
+                                    register=register,
+                                    enharmonic_pitch_class=enharmonic_pitch_class,
+                                    enharmonic_accidental=enharmonic_accidental,
+                                    **kwargs)
 
-        self.frequency = frequency
+        if is_pitch_complete(self):
+            return
 
         if frequency:
             pitch_info = pitch_info_from_frequency(frequency)
@@ -284,19 +296,14 @@ class Pitch(PitchInfo):
             self.enharmonic_pitch_class = pitch_info.enharmonic_pitch_class
             self.enharmonic_accidental = pitch_info.enharmonic_accidental
         else:
-            self.pitch_class = pitch_class
-            self.accidental = accidental
-            self.register = register
-            self.enharmonic_pitch_class = enharmonic_pitch_class
-            self.enharmonic_accidental = enharmonic_accidental
-
-            pitch_info = PitchInfo(pitch_class=pitch_class,
-                                   accidental=accidental,
-                                   register=register)
+            print(self.pitch_class, self.accidental, self.register)
+            pitch_info = PitchInfo(pitch_class=self.pitch_class,
+                                   accidental=self.accidental,
+                                   register=self.register)
             self.frequency = frequency_from_pitch_info(pitch_info)
 
     def __str__(self):
-        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
+        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.register},{self.accidental}>"
 
     def matches(self,
                 other: PitchInfo,
@@ -335,6 +342,11 @@ class KeySignature:
                                                       self.mode)))
 
 
+# TODO: in general pass CHROMATIC_PITCHES_INFO as arg (maybe 'base_pitches_info') to allow for different
+#   base pitches? We might have to change how we match using the number of semitones
+#   potentially other possibilities for base pitches are microtonal base pitches where subdivisions will
+#   now be a quarter of a semitone. This is a problem for the future!
+
 if __name__ == '__main__':
-    print(pitch_info_from_pitch_string('A4b').to_pitch())
+    print(pitch_info_from_pitch_string('A5b').to_pitch())
     print(pitch_info_from_frequency(440).to_pitch())
