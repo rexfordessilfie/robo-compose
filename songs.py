@@ -42,7 +42,7 @@ def random_song(bars=4,
                 root_frequency=440,
                 num_notes=8):
     random_notes = [
-        Note.get_random(
+        Note.random(
             key=KeySignature(pitch=Pitch(frequency=root_frequency),
                              mode=mode))
         for _ in range(num_notes)]
@@ -60,7 +60,6 @@ def scale_song(bars=1,
     scale = KeySignature(pitch=Pitch(
         frequency=root_frequency), mode=mode).get_scale()
 
-    print(scale)
     for _ in range(bars):
         Tone.play_melody(scale)
         rest()

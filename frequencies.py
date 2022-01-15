@@ -140,7 +140,10 @@ def pitch_from_pitch_string(pitch_str: str):
                                           accidental=accidental,
                                           register=register)
 
-    return Pitch(pitch_class=pitch_class, accidental=accidental, register=register, frequency=frequency)
+    return Pitch(pitch_class=pitch_class,
+                 accidental=accidental,
+                 register=register,
+                 frequency=frequency)
 
 
 def pitch_from_frequency(frequency: float):
