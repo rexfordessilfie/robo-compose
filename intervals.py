@@ -1,6 +1,3 @@
-import math
-from sre_constants import error
-
 
 class Interval:
     def __init__(self, value: float):
