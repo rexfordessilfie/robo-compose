@@ -1,7 +1,7 @@
 import math
 import copy
-from intervals import EqualTemperament as et
-from main import Accidental as al, Pitch, PitchClass as pc
+from composer.intervals import EqualTemperament
+from composer.main import Accidental, Pitch, PitchClass
 
 """
 List of chromatic pitches in the western music system.
@@ -9,74 +9,74 @@ NB: at least one of these pitches must be complete.
 """
 CHROMATIC_PITCHES = [
     # Pitch<A,natural,4>
-    Pitch(pitch_class=pc.A,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.A,
+          accidental=Accidental.NATURAL,
           register=4,
           frequency=440),
 
     # Pitch<A,sharp,4>
-    Pitch(pitch_class=pc.A,
-          accidental=al.SHARP,
-          enharmonic_pitch_class=pc.B,
-          enharmonic_accidental=al.FLAT,
+    Pitch(pitch_class=PitchClass.A,
+          accidental=Accidental.SHARP,
+          enharmonic_pitch_class=PitchClass.B,
+          enharmonic_accidental=Accidental.FLAT,
           register=4),
 
     # Pitch<B,natural,4>
-    Pitch(pitch_class=pc.B,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.B,
+          accidental=Accidental.NATURAL,
           register=4),
 
     # Pitch<C,natural,5>
-    Pitch(pitch_class=pc.C,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.C,
+          accidental=Accidental.NATURAL,
           register=5),
 
     # Pitch<C,sharp,5>
-    Pitch(pitch_class=pc.C,
-          accidental=al.SHARP,
-          enharmonic_pitch_class=pc.D,
-          enharmonic_accidental=al.FLAT,
+    Pitch(pitch_class=PitchClass.C,
+          accidental=Accidental.SHARP,
+          enharmonic_pitch_class=PitchClass.D,
+          enharmonic_accidental=Accidental.FLAT,
           register=5),
 
     # Pitch<D,natural,5>
-    Pitch(pitch_class=pc.D,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.D,
+          accidental=Accidental.NATURAL,
           register=5),
 
     # Pitch<D,sharp,5>
-    Pitch(pitch_class=pc.D,
-          accidental=al.SHARP,
-          enharmonic_pitch_class=pc.E,
-          enharmonic_accidental=al.FLAT,
+    Pitch(pitch_class=PitchClass.D,
+          accidental=Accidental.SHARP,
+          enharmonic_pitch_class=PitchClass.E,
+          enharmonic_accidental=Accidental.FLAT,
           register=5),
 
     # Pitch<E,natural,5>
-    Pitch(pitch_class=pc.E,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.E,
+          accidental=Accidental.NATURAL,
           register=5),
 
     # Pitch<F,natural,5>
-    Pitch(pitch_class=pc.F,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.F,
+          accidental=Accidental.NATURAL,
           register=5),
 
     # Pitch<F,sharp,5>
-    Pitch(pitch_class=pc.F,
-          accidental=al.SHARP,
-          enharmonic_pitch_class=pc.G,
-          enharmonic_accidental=al.FLAT,
+    Pitch(pitch_class=PitchClass.F,
+          accidental=Accidental.SHARP,
+          enharmonic_pitch_class=PitchClass.G,
+          enharmonic_accidental=Accidental.FLAT,
           register=5),
 
     # Pitch<G,natural,5>
-    Pitch(pitch_class=pc.G,
-          accidental=al.NATURAL,
+    Pitch(pitch_class=PitchClass.G,
+          accidental=Accidental.NATURAL,
           register=5),
 
     # Pitch<G,sharp,5>
-    Pitch(pitch_class=pc.G,
-          accidental=al.SHARP,
-          enharmonic_accidental=pc.A,
-          enharmonic_pitch_class=al.FLAT,
+    Pitch(pitch_class=PitchClass.G,
+          accidental=Accidental.SHARP,
+          enharmonic_accidental=PitchClass.A,
+          enharmonic_pitch_class=Accidental.FLAT,
           register=5),
 ]
 
@@ -86,11 +86,11 @@ def interval_between(a: float, b: float):
 
 
 def is_above_octave_range(a: float, b: float):
-    return interval_between(a, b) >= et.OCTAVE.value
+    return interval_between(a, b) >= EqualTemperament.OCTAVE.value
 
 
 def is_below_octave_range(a: float, b: float):
-    return interval_between(a, b) < et.UNISON.value
+    return interval_between(a, b) < EqualTemperament.UNISON.value
 
 
 def is_pitch_complete(p: Pitch):
@@ -100,7 +100,7 @@ def is_pitch_complete(p: Pitch):
 def complete_keyboard_pitch():
     for idx, pitch in enumerate(CHROMATIC_PITCHES):
         if is_pitch_complete(pitch):
-            yield (pitch, idx)
+            yield pitch, idx
 
 
 def is_matching_pitch(a: Pitch, b: Pitch):
@@ -110,18 +110,18 @@ def is_matching_pitch(a: Pitch, b: Pitch):
 def matching_keyboard_pitch(p: Pitch):
     for idx, pitch in enumerate(CHROMATIC_PITCHES):
         if is_matching_pitch(p, pitch):
-            yield (pitch, idx)
+            yield pitch, idx
 
 
 def pitch_from_pitch_string(pitch_str: str):
     """
     Parse a pitch string representation.
-    eg. C4#, A5#, G8b
+    e.g. C4#, A5#, G8b
     """
     parts = tuple((c for c in pitch_str))
     size = len(parts)
 
-    pitch_class = register = accidental = frequency = None
+    pitch_class = register = accidental = None
 
     if size == 1:
         (pitch_class,) = parts
@@ -130,9 +130,9 @@ def pitch_from_pitch_string(pitch_str: str):
     elif size >= 3:
         (pitch_class, register, accidental) = parts[:3]
 
-    accidental = al.SHARP if accidental == '#' \
-        else al.FLAT if accidental == 'b' \
-        else al.NATURAL
+    accidental = Accidental.SHARP if accidental == '#' \
+        else Accidental.FLAT if accidental == 'b' \
+        else Accidental.NATURAL
 
     register = int(register)
 
@@ -154,19 +154,19 @@ def pitch_from_frequency(frequency: float):
 
     # how many times and in what direction do we need to reduce/increase octave
     # to normalize to the same octave range
-    normalization_scale = math.floor(math.log(reference_pitch.frequency, et.OCTAVE.value) -
-                                     math.log(frequency, et.OCTAVE.value))
+    normalization_scale = math.floor(math.log(reference_pitch.frequency, EqualTemperament.OCTAVE.value) -
+                                     math.log(frequency, EqualTemperament.OCTAVE.value))
 
     # normalize the frequency by multiplying with the normalization interval
-    # i.e the number of octaves we need to normalize the frequency
-    normalization_interval = et.OCTAVE.value**normalization_scale
+    # i.e. the number of octaves we need to normalize the frequency
+    normalization_interval = EqualTemperament.OCTAVE.value ** normalization_scale
     normalized_frequency = frequency * normalization_interval
 
     normalized_interval = interval_between(reference_pitch.frequency,
                                            normalized_frequency)
 
     num_semitones_from_reference = round(
-        math.log(normalized_interval, et.SEMITONE.value)
+        math.log(normalized_interval, EqualTemperament.SEMITONE.value)
     )
 
     final_pitch_idx = (reference_pitch_idx +
@@ -181,9 +181,9 @@ def pitch_from_frequency(frequency: float):
     return final_pitch
 
 
-def frequency_from_pitch_info(pitch_class: pc = None,
+def frequency_from_pitch_info(pitch_class: PitchClass = None,
                               register: int = 4,
-                              accidental: al = al.NATURAL):
+                              accidental: Accidental = Accidental.NATURAL):
 
     matching_pitch, matching_pitch_idx = next(
         matching_keyboard_pitch(
@@ -199,9 +199,9 @@ def frequency_from_pitch_info(pitch_class: pc = None,
     octave_difference = register - reference_pitch.register
 
     base_frequency = reference_pitch.frequency * \
-        (et.SEMITONE.value**num_semitones_from_reference)
+        (EqualTemperament.SEMITONE.value ** num_semitones_from_reference)
 
-    final_frequency = base_frequency * (et.OCTAVE.value**octave_difference)
+    final_frequency = base_frequency * (EqualTemperament.OCTAVE.value ** octave_difference)
     return final_frequency
 
 

@@ -1,8 +1,8 @@
 from typing import List, Union
-from main import Note, Pitch
+from composer.main import Note, Pitch
 
 
-from synthesizer import Player as Player, Synthesizer, Waveform
+from synthesizer import Player, Synthesizer, Waveform
 
 
 class Tone:

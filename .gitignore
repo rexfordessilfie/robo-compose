@@ -1,4 +1,7 @@
 env
+venv
 notes.txt
 __pycache__/
 .vscode
+.idea
+notebook.ipynb

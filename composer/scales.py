@@ -1,12 +1,12 @@
 from typing import List
-from intervals import EqualTemperament as et, Interval
+from composer.intervals import EqualTemperament, Interval
 
 
 class ScaleIntervalsRelatedToStartFrequency:
     MAJOR = [
-        et.UNISON, et.MAJOR_SECOND, et.MAJOR_THIRD,
-        et.PERFECT_FOURTH, et.PERFECT_FIFTH, et.MAJOR_SIXTH,
-        et.MAJOR_SEVENTH, et.OCTAVE
+        EqualTemperament.UNISON, EqualTemperament.MAJOR_SECOND, EqualTemperament.MAJOR_THIRD,
+        EqualTemperament.PERFECT_FOURTH, EqualTemperament.PERFECT_FIFTH, EqualTemperament.MAJOR_SIXTH,
+        EqualTemperament.MAJOR_SEVENTH, EqualTemperament.OCTAVE
     ]
 
     MINOR = []
@@ -14,26 +14,26 @@ class ScaleIntervalsRelatedToStartFrequency:
 
 class ScaleIntervalsRelatedToNextNote:
     CHROMATIC = [
-        et.UNISON, et.SEMITONE, et.SEMITONE,
-        et.SEMITONE, et.SEMITONE, et.SEMITONE,
-        et.SEMITONE, et.SEMITONE, et.SEMITONE,
-        et.SEMITONE, et.SEMITONE, et.SEMITONE,
-        et.SEMITONE
+        EqualTemperament.UNISON, EqualTemperament.SEMITONE, EqualTemperament.SEMITONE,
+        EqualTemperament.SEMITONE, EqualTemperament.SEMITONE, EqualTemperament.SEMITONE,
+        EqualTemperament.SEMITONE, EqualTemperament.SEMITONE, EqualTemperament.SEMITONE,
+        EqualTemperament.SEMITONE, EqualTemperament.SEMITONE, EqualTemperament.SEMITONE,
+        EqualTemperament.SEMITONE
     ]
 
 
 class ScaleBuilder:
     def __init__(
         self,
-        interval_list: List[Interval] = [],
-        frequency_list: List[int] = [],
+        interval_list: List[Interval] = None,
+        frequency_list: List[int] = None,
         intervals_relative_to_start=False,
         intervals_relative_to_next=False,
     ):
-        self.interval_list = interval_list
-        self.intervals_relative_to_start = intervals_relative_to_start
-        self.intervals_relative_to_next = intervals_relative_to_next
-        self.frequency_list = frequency_list
+        self.interval_list = interval_list if interval_list else []
+        self.intervals_relative_to_start = intervals_relative_to_start if intervals_relative_to_start else []
+        self.intervals_relative_to_next = intervals_relative_to_next if intervals_relative_to_next else []
+        self.frequency_list = frequency_list if frequency_list else []
 
     def extend_interval_list(self, intervals: List[Interval]):
         self.interval_list.extend(intervals)
@@ -62,7 +62,7 @@ class ScaleBuilder:
 
 
 class ScaleFactory:
-    '''Exposes functions to get a scale builder or to build a scale and return it. '''
+    """Exposes functions to get a scale builder or to build a scale and return it."""
     MajorScaleBuilder = ScaleBuilder(
         interval_list=ScaleIntervalsRelatedToStartFrequency.MAJOR,
         intervals_relative_to_start=True)
@@ -80,17 +80,17 @@ class ScaleFactory:
 
     @classmethod
     def get_scale_builder(cls, mode) -> ScaleBuilder:
-        if (mode == "major"):
+        if mode == "major":
             return cls.MajorScaleBuilder
 
-        if (mode == "minor"):
+        if mode == "minor":
             return cls.MinorScaleBuilder
 
-        if (mode == "chromatic"):
+        if mode == "chromatic":
             return cls.ChromaticScaleBuilder
 
     @classmethod
-    def get_scale(cls, start_frequency, mode) -> List[int]:
+    def get_scale(cls, start_frequency, mode) -> List[float]:
         scale_builder = cls.get_scale_builder(mode)
         scale = scale_builder.build(start_frequency)
         return scale

@@ -1,9 +1,9 @@
 
 import time
-from tone import Tone
-from chords import ChordFactory
-from intervals import EqualTemperament as et
-from main import KeySignature, Note, Pitch
+from composer.tone import Tone
+from composer.chords import ChordFactory
+from composer.intervals import EqualTemperament
+from composer.main import KeySignature, Note, Pitch
 
 
 def rest(duration=0.005):
@@ -15,18 +15,18 @@ def slider_song(bars=4):
     for _ in range(bars):
         Tone.play_progression(
             [chord,
-             map(et.sharpen, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord),
-             map(et.flatten, chord)])
+             map(EqualTemperament.sharpen, chord),
+             map(EqualTemperament.flatten, chord),
+             map(EqualTemperament.flatten, chord),
+             map(EqualTemperament.flatten, chord),
+             map(EqualTemperament.flatten, chord)])
         rest(0.005)
 
 
 def summer_fun_song(bars=4):
     chord1 = ChordFactory.get_chord(440, 'M')
-    chord2 = ChordFactory.get_chord(440 * et.P4, 'M')
-    chord3 = ChordFactory.get_chord(440 * et.P5, 'M')
+    chord2 = ChordFactory.get_chord(440 * EqualTemperament.P4, 'M')
+    chord3 = ChordFactory.get_chord(440 * EqualTemperament.P5, 'M')
 
     for _ in range(bars):
         Tone.play_progression(

@@ -1,44 +1,44 @@
-from intervals import EqualTemperament as et, Interval
-from scales import ScaleBuilder
+from composer.intervals import EqualTemperament
+from composer.scales import ScaleBuilder
 import re
 
-# TODO: make this generic in terms of the temparament it uses?
+# TODO: make this generic in terms of the temperament it uses?
 
 
 class ChordIntervalsRelatedToStartFrequency:
     # Major chord
-    MAJOR = [et.UNISON,
-             et.MAJOR_THIRD,
-             et.PERFECT_FIFTH]
+    MAJOR = [EqualTemperament.UNISON,
+             EqualTemperament.MAJOR_THIRD,
+             EqualTemperament.PERFECT_FIFTH]
 
     # Minor chords
-    MINOR = [et.UNISON,
-             et.MINOR_THIRD,
-             et.PERFECT_FIFTH]
+    MINOR = [EqualTemperament.UNISON,
+             EqualTemperament.MINOR_THIRD,
+             EqualTemperament.PERFECT_FIFTH]
 
     # Sus2 chord
-    SUS_2 = [et.UNISON,
-             et.MAJOR_SECOND,
-             et.PERFECT_FIFTH]
+    SUS_2 = [EqualTemperament.UNISON,
+             EqualTemperament.MAJOR_SECOND,
+             EqualTemperament.PERFECT_FIFTH]
 
     # Sus4 chord
-    SUS_4 = [et.UNISON,
-             et.PERFECT_FOURTH,
-             et.PERFECT_FIFTH]
+    SUS_4 = [EqualTemperament.UNISON,
+             EqualTemperament.PERFECT_FOURTH,
+             EqualTemperament.PERFECT_FIFTH]
 
     # Diminished chord
-    DIMINISHED = [et.UNISON,
-                  et.MINOR_THIRD,
-                  et.DIMINISHED_FIFTH]
+    DIMINISHED = [EqualTemperament.UNISON,
+                  EqualTemperament.MINOR_THIRD,
+                  EqualTemperament.DIMINISHED_FIFTH]
 
     # Diminished chord
-    AUGMENTED = [et.UNISON,
-                 et.MAJOR_THIRD,
-                 et.sharpen(et.PERFECT_FIFTH)]
+    AUGMENTED = [EqualTemperament.UNISON,
+                 EqualTemperament.MAJOR_THIRD,
+                 EqualTemperament.sharpen(EqualTemperament.PERFECT_FIFTH)]
 
 
 class ChordFactory:
-    '''Exposes functions to get a scale builder or to build a scale and return it. '''
+    """Exposes functions to get a scale builder or to build a scale and return it."""
     MajorChordBuilder = ScaleBuilder(
         interval_list=ChordIntervalsRelatedToStartFrequency.MAJOR,
         intervals_relative_to_start=True)
@@ -63,27 +63,24 @@ class ChordFactory:
         interval_list=ChordIntervalsRelatedToStartFrequency.DIMINISHED,
         intervals_relative_to_start=True)
 
-    def __init__(cls):
-        pass
-
     @classmethod
     def get_chord_builder(cls, quality: str):
-        if (quality.startswith('M')):
+        if quality.startswith('M'):
             return cls.MajorChordBuilder
 
-        if (quality.startswith('m')):
+        if quality.startswith('m'):
             return cls.MinorChordBuilder
 
-        if (quality.startswith("sus2")):
+        if quality.startswith("sus2"):
             return cls.Sus2ChordBuilder
 
-        if (quality.startswith("sus4")):
+        if quality.startswith("sus4"):
             return cls.Sus4ChordBuilder
 
-        if (quality.startswith("dim")):
+        if quality.startswith("dim"):
             return cls.DiminishedChordBuilder
 
-        if (quality.startswith("aug")):
+        if quality.startswith("aug"):
             return cls.AugmentedChordBuilder
 
     @classmethod
@@ -102,7 +99,7 @@ class ChordFactory:
             # TODO: add support for aliases to allow writing chords with extensions like b13, #11 etc.
             # _q = q.replace('#4', 'A4').replace('b5', 'D4')
             try:
-                return getattr(et, q)
+                return getattr(EqualTemperament, q)
             except AttributeError:
                 raise AttributeError('unrecognized interval quality')
 

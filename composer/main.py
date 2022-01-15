@@ -1,8 +1,7 @@
 import math
 import random
-from frequencies import pitch_from_frequency
-from intervals import EqualTemperament as et, Interval
-from scales import ScaleFactory
+from composer.intervals import EqualTemperament, Interval
+from composer.scales import ScaleFactory
 
 
 class Accidental:
@@ -71,7 +70,7 @@ class Pitch:
 
     def matches(self,
                 other: 'Pitch',
-                tolerance=et.SEMITONE.value/4
+                tolerance=EqualTemperament.SEMITONE.value / 4
                 ) -> bool:
         """
         Two pitches are a match if one pitch's frequency can be expressed 
@@ -108,8 +107,8 @@ class Duration:
                quantized=False,
                bpm=None):
         """
-        TODO: get a random duration and return it. 
-        If quantized then return something that aligns to a specific division of the beat or bpm. Consider time signature??
+        TODO: get a random duration and return it. If quantized then return something that aligns to a specific
+        division of the beat or bpm. Consider time signature??
         """
         return random.random() * 1  # fraction of 1 second
 
