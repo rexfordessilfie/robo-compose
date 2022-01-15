@@ -1,11 +1,10 @@
-import math
 import copy
+import math
 import random
+from dataclasses import dataclass
 
 from composer.intervals import EqualTemperament, Interval
 from composer.scales import ScaleFactory
-
-from dataclasses import dataclass, is_dataclass
 
 
 class Accidental:
@@ -344,7 +343,7 @@ class KeySignature:
 
 # TODO: in general pass CHROMATIC_PITCHES_INFO as arg (maybe 'base_pitches_info') to allow for different
 #   base pitches? We might have to change how we match using the number of semitones
-#   potentially other possibilities for base pitches are microtonal base pitches where subdivisions will
+#   potentially other possibilities for base pitches are micro-tonal base pitches where subdivisions will
 #   now be a quarter of a semitone. This is a problem for the future!
 
 if __name__ == '__main__':
