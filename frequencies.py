@@ -92,35 +92,35 @@ def is_below_octave_range(a: float, b: float):
 
 
 def pitch_from_frequency(frequency: float):
-    reference_pitch = next(filter(lambda p: p.pitch_class == pc.A and p.accidental == al.NATURAL,
-                                  KEYBOARD_PITCHES), None)
+    """
+    Determines the Pitch from frequency
+    """
+    def is_pitch_complete(p: Pitch):
+        return p.pitch_class and p.accidental and p.frequency
 
-    normalized_interval = frequency / reference_pitch.frequency
-    normalization_scale = 0
+    def complete_keyboard_pitch(index=False):
+        for idx, pitch in enumerate(KEYBOARD_PITCHES):
+            if is_pitch_complete(pitch):
+                yield (pitch, idx)
 
-    # normalize frequency to same octave
-    while True:
-        below_octave_range = is_below_octave_range(
-            reference_pitch.frequency, reference_pitch.frequency * normalized_interval)
+    reference_pitch, reference_pitch_idx = next(complete_keyboard_pitch())
 
-        above_octave_range = is_above_octave_range(
-            reference_pitch.frequency, reference_pitch.frequency * normalized_interval)
+    # how many times and in what direction do we need to reduce/increase octave
+    # to normalize to the same octave range
+    normalization_scale = math.floor(math.log(reference_pitch.frequency, et.OCTAVE.value) -
+                                     math.log(frequency, et.OCTAVE.value))
 
-        if below_octave_range:
-            normalized_interval *= float(2)
-            normalization_scale -= 1
-        elif above_octave_range:
-            normalized_interval /= float(2)
-            normalization_scale += 1
-        else:
-            break
+    # normalize the frequency by multiplying with the normalization interval
+    # i.e the number of octaves we need to normalize the frequency
+    normalization_interval = et.OCTAVE.value**normalization_scale
+    normalized_frequency = frequency * normalization_interval
+
+    normalized_interval = interval_between(reference_pitch.frequency,
+                                           normalized_frequency)
 
     num_semitones_from_reference = round(
         math.log(normalized_interval, et.SEMITONE.value)
     )
-
-    reference_pitch_idx = next(i for i, v in enumerate(
-        KEYBOARD_PITCHES) if KEYBOARD_PITCHES[i].pitch_class == reference_pitch.pitch_class)
 
     final_pitch_idx = (reference_pitch_idx +
                        num_semitones_from_reference) % len(KEYBOARD_PITCHES)
@@ -128,11 +128,12 @@ def pitch_from_frequency(frequency: float):
     found_pitch = KEYBOARD_PITCHES[final_pitch_idx]
     final_pitch = copy.deepcopy(found_pitch)
 
-    final_pitch.register = final_pitch.register + normalization_scale
+    final_pitch.register = final_pitch.register + (-normalization_scale)
     final_pitch.frequency = frequency
 
     return final_pitch
 
 
 if __name__ == '__main__':
-    print(pitch_from_frequency(440))
+    val = 440 * et.OCTAVE
+    print(pitch_from_frequency(val))
