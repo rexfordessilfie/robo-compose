@@ -1,5 +1,6 @@
 import math
 import random
+from frequencies import pitch_from_frequency
 from intervals import EqualTemperament as et, Interval
 from scales import ScaleFactory
 
@@ -31,7 +32,7 @@ class PitchClass:
 
 
 class KeySignature:
-    def __init__(self, pitch, mode):
+    def __init__(self, pitch: 'Pitch', mode):
         self.pitch = pitch
         self.mode = mode
 
@@ -96,7 +97,9 @@ class Pitch:
 
 
 class Duration:
-    def __init__(self, seconds=0, note_value=None):
+    def __init__(self,
+                 seconds=0,
+                 note_value=None):
         self.duration = seconds
         self.note_value = note_value
 
