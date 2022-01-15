@@ -1,6 +1,6 @@
 from typing import List, Union
-from composer.main import Note, Pitch
-
+from composer.main import Note
+from composer.pitches import Pitch
 
 from synthesizer import Player, Synthesizer, Waveform
 

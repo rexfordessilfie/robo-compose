@@ -3,7 +3,8 @@ import time
 from composer.tone import Tone
 from composer.chords import ChordFactory
 from composer.intervals import EqualTemperament
-from composer.main import KeySignature, Note, Pitch
+from composer.main import Note
+from composer.pitches import Pitch, KeySignature
 
 
 def rest(duration=0.005):
