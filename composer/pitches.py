@@ -7,11 +7,13 @@ from typing import Union
 from composer.intervals import EqualTemperament, Interval
 from composer.scales import ScaleFactory
 
+# TODO: add 'tuning' parameter to pass tuning as argument everywhere EqualTemperament is used
+
 
 class Accidental:
-    SHARP = 'sharp'
-    NATURAL = 'natural'
     FLAT = 'flat'
+    NATURAL = 'natural'
+    SHARP = 'sharp'
 
 
 class PitchClass:
@@ -49,6 +51,9 @@ class PitchInfo:
     enharmonic_accidental: str = None
 
     def swap_enharmonic(self):
+        if not self.enharmonic_pitch_class or not self.enharmonic_accidental:
+            raise AttributeError('PitchInfo is missing enharmonic pitch class or accidental')
+
         self.pitch_class, self.enharmonic_pitch_class = self.enharmonic_pitch_class, self.pitch_class
         self.accidental, self.enharmonic_accidental = self.enharmonic_accidental, self.accidental
 
@@ -143,20 +148,13 @@ def interval_between_frequencies(a: float, b: float):
     return b / a
 
 
-def is_above_octave_range(a: float, b: float):
-    return interval_between_frequencies(a, b) >= EqualTemperament.OCTAVE.value
-
-
-def is_below_octave_range(a: float, b: float):
-    return interval_between_frequencies(a, b) < EqualTemperament.UNISON.value
-
-
 def is_pitch_complete(p: PitchInfo):
     return p.pitch_class and p.accidental and p.frequency and p.register is not None
 
 
-def complete_pitches_info():
-    for idx, pitch_info in enumerate(CHROMATIC_PITCHES_INFO):
+def complete_pitch_info_generator(pitches_info=None):
+    pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
+    for idx, pitch_info in enumerate(pitches_info):
         if is_pitch_complete(pitch_info):
             yield pitch_info, idx
 
@@ -171,16 +169,17 @@ def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
     return (a.pitch_class == b.pitch_class and a.accidental == b.accidental) or is_enharmonic_match(a, b)
 
 
-def matching_pitches_info(p: PitchInfo):
-    for idx, pitch_info in enumerate(CHROMATIC_PITCHES_INFO):
+def matching_pitch_info_generator(p: PitchInfo, pitches_info=None):
+    pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
+    for idx, pitch_info in enumerate(pitches_info):
         if is_matching_pitch_info(p, pitch_info):
             yield pitch_info, idx
 
 
-def pitch_info_from_pitch_string(pitch_str: str):
+def pitch_info_from_pitch_string(pitch_str: str) -> PitchInfo:
     """
     Parse a pitch string representation.
-    e.g. C4#, A5#, G8b
+    e.g. C#4, A#5, Gb8
     """
     parts = tuple((c for c in pitch_str))
     size = len(parts)
@@ -192,7 +191,7 @@ def pitch_info_from_pitch_string(pitch_str: str):
     elif size == 2:
         (pitch_class, register) = parts
     elif size >= 3:
-        (pitch_class, register, accidental) = parts[:3]
+        (pitch_class, accidental, register) = parts[:3]
 
     accidental = Accidental.SHARP if accidental == '#' \
         else Accidental.FLAT if accidental == 'b' \
@@ -202,7 +201,7 @@ def pitch_info_from_pitch_string(pitch_str: str):
     pitch_info = PitchInfo(pitch_class=pitch_class, accidental=accidental)
 
     matching_chromatic_pitch_info, _ = next(
-        matching_pitches_info(pitch_info)
+        matching_pitch_info_generator(pitch_info, CHROMATIC_PITCHES_INFO)
     )
 
     final_pitch_info = copy.deepcopy(matching_chromatic_pitch_info)
@@ -216,11 +215,11 @@ def pitch_info_from_pitch_string(pitch_str: str):
     return final_pitch_info
 
 
-def pitch_info_from_frequency(frequency: float):
+def pitch_info_from_frequency(frequency: float) -> PitchInfo:
     """
     Determines the Pitch from frequency
     """
-    reference_pitch, reference_pitch_idx = next(complete_pitches_info())
+    reference_pitch, reference_pitch_idx = next(complete_pitch_info_generator())
 
     # how many times and in what direction do we need to reduce/increase octave
     # to normalize to the same octave range
@@ -235,6 +234,8 @@ def pitch_info_from_frequency(frequency: float):
     normalized_interval = interval_between_frequencies(reference_pitch.frequency,
                                                        normalized_frequency)
 
+    # TODO: maybe get more specific about this rounding? What tolerance are we willing to accept when there are extra
+    #   decimals?
     num_semitones_from_reference = round(
         math.log(normalized_interval, EqualTemperament.SEMITONE.value)
     )
@@ -252,9 +253,9 @@ def pitch_info_from_frequency(frequency: float):
 
 
 def frequency_from_pitch_info(pitch_info: PitchInfo):
-    reference_pitch, reference_pitch_idx = next(complete_pitches_info())
-    matching_pitch, matching_pitch_idx = next(matching_pitches_info(PitchInfo(pitch_class=pitch_info.pitch_class,
-                                                                              accidental=pitch_info.accidental)))
+    reference_pitch, reference_pitch_idx = next(complete_pitch_info_generator())
+    matching_pitch, matching_pitch_idx = next(matching_pitch_info_generator(PitchInfo(pitch_class=pitch_info.pitch_class,
+                                                                                      accidental=pitch_info.accidental)))
 
     num_semitones_from_reference = abs(matching_pitch_idx - reference_pitch_idx)
 
@@ -277,13 +278,13 @@ class Pitch(PitchInfo):
             enharmonic_accidental=None,
     ):
 
-        is_identifier_pitch_string = isinstance(identifier, str)
-        is_identifier_frequency = isinstance(identifier, (int, float))
+        is_pitch_string_identifier = isinstance(identifier, str)
+        is_frequency_identifier = isinstance(identifier, (int, float))
 
-        frequency = identifier if is_identifier_frequency else None
-        pitch_string = identifier if is_identifier_pitch_string else None
+        frequency = identifier if is_frequency_identifier else None
+        pitch_string = identifier if is_pitch_string_identifier else None
 
-        super(Pitch, self).__init__(frequency=identifier if is_identifier_frequency else None,
+        super(Pitch, self).__init__(frequency=frequency,
                                     pitch_class=pitch_class,
                                     accidental=accidental,
                                     register=register,
@@ -312,10 +313,10 @@ class Pitch(PitchInfo):
         self.enharmonic_accidental = pitch_info.enharmonic_accidental
 
     def __str__(self):
-        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.register},{self.accidental}>"
+        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
 
     def matches(self,
-                other: PitchInfo,
+                other: 'Pitch',
                 tolerance=EqualTemperament.SEMITONE.value / 4
                 ) -> bool:
         """
@@ -357,4 +358,4 @@ class KeySignature:
 #   now be a quarter of a semitone. This is a problem for the future!
 
 if __name__ == '__main__':
-    print(Pitch('A5'))
+    print(Pitch('Gb8'))
