@@ -2,6 +2,7 @@ import copy
 import math
 import random
 from dataclasses import dataclass
+from typing import Union
 
 from composer.intervals import EqualTemperament, Interval
 from composer.scales import ScaleFactory
@@ -24,7 +25,13 @@ class PitchClass:
 
     @staticmethod
     def get_list(start: str = None):
-        default = [PitchClass.A, PitchClass.B, PitchClass.C, PitchClass.D, PitchClass.E, PitchClass.F, PitchClass.G]
+        default = [PitchClass.A,
+                   PitchClass.B,
+                   PitchClass.C,
+                   PitchClass.D,
+                   PitchClass.E,
+                   PitchClass.F,
+                   PitchClass.G]
         if start:
             start_idx = default.index(start)
             return default[start_idx:] + default[:start_idx]
@@ -46,7 +53,7 @@ class PitchInfo:
         self.accidental, self.enharmonic_accidental = self.enharmonic_accidental, self.accidental
 
     def to_pitch(self):
-        return Pitch(frequency=self.frequency,
+        return Pitch(identifier=self.frequency,
                      pitch_class=self.pitch_class,
                      accidental=self.accidental,
                      register=self.register,
@@ -128,7 +135,7 @@ CHROMATIC_PITCHES_INFO = [
               accidental=Accidental.SHARP,
               enharmonic_pitch_class=PitchClass.A,
               enharmonic_accidental=Accidental.FLAT,
-              register=5),
+              register=5)
 ]
 
 
@@ -156,7 +163,8 @@ def complete_pitches_info():
 
 def is_enharmonic_match(a: PitchInfo, b: PitchInfo):
     return (a.enharmonic_pitch_class == b.pitch_class and a.enharmonic_accidental == b.accidental) or \
-           (a.pitch_class == b.enharmonic_pitch_class and a.accidental == b.enharmonic_accidental)
+           (a.pitch_class == b.enharmonic_pitch_class and a.accidental ==
+            b.enharmonic_accidental)
 
 
 def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
@@ -244,18 +252,13 @@ def pitch_info_from_frequency(frequency: float):
 
 
 def frequency_from_pitch_info(pitch_info: PitchInfo):
-    matching_pitch, matching_pitch_idx = next(
-        matching_pitches_info(
-            PitchInfo(pitch_class=pitch_info.pitch_class,
-                      accidental=pitch_info.accidental))
-    )
-
     reference_pitch, reference_pitch_idx = next(complete_pitches_info())
+    matching_pitch, matching_pitch_idx = next(matching_pitches_info(PitchInfo(pitch_class=pitch_info.pitch_class,
+                                                                              accidental=pitch_info.accidental)))
 
-    num_semitones_from_reference = abs(
-        matching_pitch_idx - reference_pitch_idx)
+    num_semitones_from_reference = abs(matching_pitch_idx - reference_pitch_idx)
 
-    octave_difference = pitch_info.register - reference_pitch.register
+    octave_difference = pitch_info.register - matching_pitch.register
 
     base_frequency = reference_pitch.frequency * (EqualTemperament.SEMITONE.value ** num_semitones_from_reference)
 
@@ -266,40 +269,47 @@ def frequency_from_pitch_info(pitch_info: PitchInfo):
 class Pitch(PitchInfo):
     def __init__(
             self,
-            *args,
-            frequency=None,
+            identifier: Union[str, int, float] = None,
             pitch_class=None,
             accidental=Accidental.NATURAL,
             register=4,
             enharmonic_pitch_class=None,
             enharmonic_accidental=None,
-            **kwargs
     ):
-        super(Pitch, self).__init__(*args,
-                                    frequency=frequency,
+
+        is_identifier_pitch_string = isinstance(identifier, str)
+        is_identifier_frequency = isinstance(identifier, (int, float))
+
+        frequency = identifier if is_identifier_frequency else None
+        pitch_string = identifier if is_identifier_pitch_string else None
+
+        super(Pitch, self).__init__(frequency=identifier if is_identifier_frequency else None,
                                     pitch_class=pitch_class,
                                     accidental=accidental,
                                     register=register,
                                     enharmonic_pitch_class=enharmonic_pitch_class,
-                                    enharmonic_accidental=enharmonic_accidental,
-                                    **kwargs)
+                                    enharmonic_accidental=enharmonic_accidental)
 
         if is_pitch_complete(self):
             return
 
-        if frequency:
+        if frequency is not None:
             pitch_info = pitch_info_from_frequency(frequency)
-            self.pitch_class = pitch_info.pitch_class
-            self.accidental = pitch_info.accidental
-            self.register = pitch_info.register
-            self.enharmonic_pitch_class = pitch_info.enharmonic_pitch_class
-            self.enharmonic_accidental = pitch_info.enharmonic_accidental
+            self.frequency = frequency
+        elif pitch_string is not None:
+            pitch_info = pitch_info_from_pitch_string(pitch_string)
+            self.frequency = pitch_info.frequency
         else:
-            print(self.pitch_class, self.accidental, self.register)
             pitch_info = PitchInfo(pitch_class=self.pitch_class,
                                    accidental=self.accidental,
                                    register=self.register)
             self.frequency = frequency_from_pitch_info(pitch_info)
+
+        self.pitch_class = pitch_info.pitch_class
+        self.accidental = pitch_info.accidental
+        self.register = pitch_info.register
+        self.enharmonic_pitch_class = pitch_info.enharmonic_pitch_class
+        self.enharmonic_accidental = pitch_info.enharmonic_accidental
 
     def __str__(self):
         return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.register},{self.accidental}>"
@@ -319,14 +329,14 @@ class Pitch(PitchInfo):
         return extra_interval_decimal < tolerance
 
     def pitch_at_interval(self, interval: Interval):
-        return Pitch(frequency=self.frequency * interval.value)
+        return Pitch(self.frequency * interval.value)
 
     @staticmethod
     def random(key=None):
         if key and isinstance(key, KeySignature):
             scale = key.get_scale()
             random_index = random.randrange(0, len(scale))
-            return Pitch(frequency=scale[random_index])
+            return scale[random_index]
         else:
             raise ValueError('invalid key signature')
 
@@ -347,5 +357,4 @@ class KeySignature:
 #   now be a quarter of a semitone. This is a problem for the future!
 
 if __name__ == '__main__':
-    print(pitch_info_from_pitch_string('A5b').to_pitch())
-    print(pitch_info_from_frequency(440).to_pitch())
+    print(Pitch('A5'))

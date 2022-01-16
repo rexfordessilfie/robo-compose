@@ -44,13 +44,12 @@ def random_song(bars=4,
                 num_notes=8):
     random_notes = [
         Note.random(
-            key=KeySignature(pitch=Pitch(frequency=root_frequency),
-                             mode=mode))
+            key=KeySignature(pitch=Pitch(root_frequency), mode=mode))
         for _ in range(num_notes)]
 
     for _ in range(bars):
         Tone.play_melody(random_notes)
-        rest()
+        rest(0.005)
 
 
 def scale_song(bars=1,
@@ -58,12 +57,11 @@ def scale_song(bars=1,
                root_frequency=440,
                ):
 
-    scale = KeySignature(pitch=Pitch(
-        frequency=root_frequency), mode=mode).get_scale()
+    scale = KeySignature(pitch=Pitch(root_frequency), mode=mode).get_scale()
 
     for _ in range(bars):
         Tone.play_melody(scale)
-        rest()
+        rest(0.005)
 
 
 if __name__ == '__main__':
