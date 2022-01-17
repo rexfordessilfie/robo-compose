@@ -9,7 +9,9 @@ from composer.pitches import PitchClass, PitchInfo, Accidental, Pitch, KeySignat
 
 
 def test_pitch_class_size():
-    assert len(PitchClass.get_list()) == 7
+    assert len(PitchClass.all()) == 7
+    assert len(PitchClass.sharp()) == 5
+    assert len(PitchClass.flat()) == 5
 
 
 def test_swap_enharmonic():
@@ -111,6 +113,43 @@ def test_chromatic_pitches_info():
     assert next(matching_pitch_info_generator(enharmonic_pitch_info, CHROMATIC_PITCHES_INFO)) is not None
 
 
+def test_contiguous_chromatic_pitches_registers():
+    _c_natural_pitch_info = PitchInfo(pitch_class=PitchClass.C, accidental=Accidental.NATURAL)
+    c_natural_pitch_info, c_natural_pitch_info_idx = next(matching_pitch_info_generator(_c_natural_pitch_info,
+                                                                                        CHROMATIC_PITCHES_INFO))
+    # register checks
+    for i in range(c_natural_pitch_info_idx, len(CHROMATIC_PITCHES_INFO)):
+        current = CHROMATIC_PITCHES_INFO[i]
+        expected_register = c_natural_pitch_info.register
+        assert current.register == expected_register, f"expected pitch after {PitchClass.C}" \
+                                                      f"to have same register: {expected_register}"
+    for i in range(0, c_natural_pitch_info_idx):
+        current = CHROMATIC_PITCHES_INFO[i]
+        expected_register = c_natural_pitch_info.register - 1
+        assert current.register == expected_register, f"expected pitch after {PitchClass.C}" \
+                                                      f"to have one less register: {expected_register}"
+
+
+def test_contiguous_chromatic_pitches_info_forward():
+    # contiguous checks -> forward pass for sharp
+    for i in range(0, len(CHROMATIC_PITCHES_INFO) - 1):
+        current = CHROMATIC_PITCHES_INFO[i]
+        next_ = CHROMATIC_PITCHES_INFO[i + 1]
+        expected = PitchInfo(pitch_class=current.pitch_class, accidental=current.accidental).next()
+        assert is_matching_pitch_info(next_, expected), f"expected pitch {expected} " \
+                                                        f"at index {i + 1} but found {next_}"
+
+
+def test_contiguous_chromatic_pitches_info_backward():
+    # contiguous checks -> backward pass for flat
+    for i in range(len(CHROMATIC_PITCHES_INFO) - 1, -1, -1):
+        current = CHROMATIC_PITCHES_INFO[i]
+        next_ = CHROMATIC_PITCHES_INFO[i - 1]
+        expected = PitchInfo(pitch_class=current.pitch_class, accidental=current.accidental).prev()
+        assert is_matching_pitch_info(next_, expected), f"expected pitch {expected} " \
+                                                        f"at index {i + 1} but found {next_}"
+
+
 def test_pitch_info_from_pitch_string():
     a_flat_5 = pitch_info_from_pitch_string('Ab5')
 
@@ -136,7 +175,7 @@ def test_pitch_info_from_frequency():
 def test_pitch_matches_other():
     pitch_a = Pitch(440)
     pitch_b = Pitch('A4')
-    assert  pitch_a.matches(pitch_b)
+    assert pitch_a.matches(pitch_b)
 
 
 def test_random_pitch():
