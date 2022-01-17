@@ -7,11 +7,8 @@ class Interval:
         self.value = float(value)
         self.inverse = float(1 / value)
 
-    def __str__(self):
-        return f'Interval:{self.value}'
-
     def __repr__(self):
-        return str(self)
+        return f'Interval<{self.value}>'
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Interval):

@@ -457,7 +457,7 @@ class Pitch(PitchInfo):
         self.enharmonic_pitch_class = pitch_info.enharmonic_pitch_class
         self.enharmonic_accidental = pitch_info.enharmonic_accidental
 
-    def __str__(self):
+    def __repr__(self):
         return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
 
     def next(self):

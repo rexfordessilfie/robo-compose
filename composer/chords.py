@@ -3,6 +3,7 @@ from composer.scales import ScaleBuilder
 import re
 
 # TODO: make this generic in terms of the temperament it uses?
+# TODO: ability to label the harmonic functions of a progression of chords, given a key?
 
 
 class ChordIntervalsRelatedToStartFrequency:
