@@ -179,7 +179,7 @@ def test_pitch_matches_other():
 
 
 def test_random_pitch():
-    random_pitch = Pitch.random(key=KeySignature(pitch=Pitch(440), mode='major'))
+    random_pitch = Pitch.random(key_signature=KeySignature(pitch=Pitch(440), mode='major'))
     assert isinstance(random_pitch, Pitch)
     assert is_pitch_complete(random_pitch)
 

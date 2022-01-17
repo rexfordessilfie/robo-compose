@@ -481,9 +481,9 @@ class Pitch(PitchInfo):
         return extra_interval_decimal < tolerance
 
     @staticmethod
-    def random(key=None):
-        if key and isinstance(key, KeySignature):
-            scale = key.get_scale()
+    def random(key_signature=None):
+        if key_signature and isinstance(key_signature, KeySignature):
+            scale = key_signature.get_scale()
             random_index = random.randrange(0, len(scale))
             return scale[random_index]
         else:
