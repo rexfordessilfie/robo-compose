@@ -1,10 +1,10 @@
 import copy
 import math
-
 import pytest
 import sys
-from composer.pitches import PitchClass, PitchInfo, Accidental, Pitch, KeySignature, complete_pitch_info_generator, \
-    CHROMATIC_PITCHES_INFO, is_pitch_complete, is_matching_pitch_info, matching_pitch_info_generator, \
+
+from composer.pitches import PitchClass, PitchInfo, Accidental, Pitch, KeySignature, CHROMATIC_PITCHES_INFO, \
+    complete_pitch_info_generator, is_pitch_complete, is_matching_pitch_info, matching_pitch_info_generator, \
     is_enharmonic_match, pitch_info_from_pitch_string, pitch_info_from_frequency
 
 
@@ -135,7 +135,7 @@ def test_contiguous_chromatic_pitches_info_forward():
     for i in range(0, len(CHROMATIC_PITCHES_INFO) - 1):
         current = CHROMATIC_PITCHES_INFO[i]
         next_ = CHROMATIC_PITCHES_INFO[i + 1]
-        expected = PitchInfo(pitch_class=current.pitch_class, accidental=current.accidental).next()
+        expected = current.next()
         assert is_matching_pitch_info(next_, expected), f"expected pitch {expected} " \
                                                         f"at index {i + 1} but found {next_}"
 
@@ -144,10 +144,10 @@ def test_contiguous_chromatic_pitches_info_backward():
     # contiguous checks -> backward pass for flat
     for i in range(len(CHROMATIC_PITCHES_INFO) - 1, -1, -1):
         current = CHROMATIC_PITCHES_INFO[i]
-        next_ = CHROMATIC_PITCHES_INFO[i - 1]
-        expected = PitchInfo(pitch_class=current.pitch_class, accidental=current.accidental).prev()
-        assert is_matching_pitch_info(next_, expected), f"expected pitch {expected} " \
-                                                        f"at index {i + 1} but found {next_}"
+        prev = CHROMATIC_PITCHES_INFO[i - 1]
+        expected = current.prev()
+        assert is_matching_pitch_info(prev, expected), f"expected pitch {expected} " \
+                                                       f"at index {i - 1} but found {prev}"
 
 
 def test_pitch_info_from_pitch_string():

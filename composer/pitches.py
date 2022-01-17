@@ -6,7 +6,7 @@ from typing import Union, Generator, Tuple, List
 
 from composer.intervals import EqualTemperament
 from composer.scales import ScaleFactory
-from composer.utils import next_element, previous_element
+from composer.utils import next_wrap, prev_wrap
 
 
 # TODO: add 'temperament' parameter to pass tuning as argument everywhere EqualTemperament is used
@@ -22,9 +22,7 @@ class Accidental:
         Return accidentals in order of 'increase', with natural at 0
         TODO: add support for micro-tonal accidentals?
         """
-        default = [Accidental.FLAT,
-                   Accidental.NATURAL,
-                   Accidental.SHARP]
+        default = [Accidental.FLAT, Accidental.NATURAL, Accidental.SHARP]
         if start:
             start_idx = default.index(start)
             return default[start_idx:] + default[:start_idx]
@@ -33,12 +31,12 @@ class Accidental:
     @staticmethod
     def next(current: str):
         accidentals = Accidental.all()
-        return next_element(current, accidentals, overlap_size=1)
+        return next_wrap(current, accidentals, overlap_size=1)
 
     @staticmethod
     def prev(current: str):
         accidentals = Accidental.all()
-        return previous_element(current, accidentals, overlap_size=1)
+        return prev_wrap(current, accidentals, overlap_size=1)
 
 
 class PitchClass:
@@ -97,9 +95,7 @@ class PitchClass:
         TODO: make this an instance function? Allow for PitchClass('C').next()
         """
         pitch_classes = PitchClass.all()
-        curr_idx = pitch_classes.index(current)
-        idx = (curr_idx + 1) % len(pitch_classes)
-        return pitch_classes[idx]
+        return next_wrap(current, pitch_classes)
 
     @staticmethod
     def prev(current: str):
@@ -107,9 +103,7 @@ class PitchClass:
         Get the previous pitch class from current in Western Music system
         """
         pitch_classes = PitchClass.all()
-        curr_idx = pitch_classes.index(current)
-        idx = (curr_idx - 1 + len(pitch_classes)) % len(pitch_classes)
-        return pitch_classes[idx]
+        return prev_wrap(current, pitch_classes)
 
 
 @dataclass
@@ -122,6 +116,9 @@ class PitchInfo:
     enharmonic_accidental: str = None
 
     def next(self):
+        """
+        Get the next pitch after the current one.
+        """
         pitch_info = copy.deepcopy(self)
         pitch_info.frequency = None
 
@@ -137,6 +134,9 @@ class PitchInfo:
         return pitch_info
 
     def prev(self):
+        """
+        Get the pitch info before the current pitch.
+        """
         pitch_info = copy.deepcopy(self)
         pitch_info.frequency = None
 
@@ -152,6 +152,9 @@ class PitchInfo:
         return pitch_info
 
     def fill_enharmonic(self):
+        """
+        Fills in the enharmonic information if it is not present.
+        """
         if not self.enharmonic_pitch_class or not self.enharmonic_accidental:
 
             if self.accidental == Accidental.SHARP:
@@ -165,6 +168,9 @@ class PitchInfo:
                 raise AttributeError(f"enharmonic not supported for accidental: {self.accidental}")
 
     def swap_enharmonic(self):
+        """
+        Swaps the enharmonic pitch and accidentals to be the main ones.
+        """
         self.fill_enharmonic()
 
         if not self.enharmonic_pitch_class or not self.enharmonic_accidental:
@@ -174,6 +180,9 @@ class PitchInfo:
         self.accidental, self.enharmonic_accidental = self.enharmonic_accidental, self.accidental
 
     def to_pitch(self):
+        """
+        Transform the pitch info into a (complete) pitch.
+        """
         return Pitch(identifier=self.frequency,
                      pitch_class=self.pitch_class,
                      accidental=self.accidental,
@@ -260,14 +269,23 @@ CHROMATIC_PITCHES_INFO = [
 
 
 def interval_between_frequencies(a: float, b: float):
+    """
+    Find the interval between two frequencies.
+    """
     return b / a
 
 
 def is_pitch_complete(p: PitchInfo):
+    """
+    Check if a pitch/pitch info is complete, i.e. has a pitch class, accidental, frequency and register.
+    """
     return p.pitch_class and p.accidental and p.frequency and p.register is not None
 
 
 def complete_pitch_info_generator(pitches_info: List[PitchInfo] = None) -> Generator[Tuple[PitchInfo, int], None, None]:
+    """
+    Convenience generator to find a complete pitch from the list of chromatic pitches.
+    """
     pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
     for idx, pitch_info in enumerate(pitches_info):
         if is_pitch_complete(pitch_info):
@@ -275,17 +293,25 @@ def complete_pitch_info_generator(pitches_info: List[PitchInfo] = None) -> Gener
 
 
 def is_enharmonic_match(a: PitchInfo, b: PitchInfo):
+    """
+    Check if two pitches are enharmonic matches.
+    """
     return (a.enharmonic_pitch_class == b.pitch_class and a.enharmonic_accidental == b.accidental) or \
-           (a.pitch_class == b.enharmonic_pitch_class and a.accidental ==
-            b.enharmonic_accidental)
+           (a.pitch_class == b.enharmonic_pitch_class and a.accidental == b.enharmonic_accidental)
 
 
 def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
+    """
+    Check if two pitches have matching information (apart from the frequency).
+    """
     return (a.pitch_class == b.pitch_class and a.accidental == b.accidental) or is_enharmonic_match(a, b)
 
 
 def matching_pitch_info_generator(p: PitchInfo,
                                   pitches_info: List[PitchInfo] = None) -> Generator[Tuple[PitchInfo, int], None, None]:
+    """
+    Convenience generator for finding a matching pitch from a list of pitches.
+    """
     pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
     for idx, pitch_info in enumerate(pitches_info):
         if is_matching_pitch_info(p, pitch_info):
@@ -294,8 +320,7 @@ def matching_pitch_info_generator(p: PitchInfo,
 
 def pitch_info_from_pitch_string(pitch_str: str) -> PitchInfo:
     """
-    Parse a pitch string representation.
-    e.g. C#4, A#5, Gb8
+    Parse a pitch string representation. E.g. C#4, A#5, Gb8
     """
     parts = tuple((c for c in pitch_str))
     size = len(parts)
@@ -333,7 +358,7 @@ def pitch_info_from_pitch_string(pitch_str: str) -> PitchInfo:
 
 def pitch_info_from_frequency(frequency: float) -> PitchInfo:
     """
-    Determines the Pitch from frequency
+    Determines the pitch information from a frequency.
     """
     reference_pitch, reference_pitch_idx = next(complete_pitch_info_generator())
 
@@ -369,6 +394,9 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
 
 
 def frequency_from_pitch_info(pitch_info: PitchInfo):
+    """
+    Determine the frequency from the pitch information.
+    """
     reference_pitch, reference_pitch_idx = next(complete_pitch_info_generator())
     matching_pitch, matching_pitch_idx = next(
         matching_pitch_info_generator(PitchInfo(pitch_class=pitch_info.pitch_class,
