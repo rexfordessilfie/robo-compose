@@ -1,5 +1,5 @@
 from typing import List, Union
-from composer.main import Note
+from composer.notes import Note, Duration
 from composer.pitches import Pitch
 
 from synthesizer import Player, Synthesizer, Waveform
@@ -28,7 +28,8 @@ class Tone:
 
     @classmethod
     def get_duration(cls, o: object, default: float = None):
-        return o.duration if isinstance(o, Note) \
+        return o.duration.value if isinstance(o, Note) \
+            else o.value if isinstance(o, Duration) \
             else default
 
     @classmethod
