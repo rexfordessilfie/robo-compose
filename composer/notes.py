@@ -88,7 +88,6 @@ def viable_durations_generator(bpm: float,
 
     for note_value in sorted(note_values):
         duration = duration_from_note_value(note_value, bpm, time_signature.beat_value)
-        print(duration)
         if (not max_duration) or duration <= max_duration:
             yield duration
 
@@ -114,7 +113,7 @@ class Duration:
         pass
 
     @staticmethod
-    def random(multiplier: float = 1,
+    def random(factor: float = 1,
                bpm: int = None,
                time_signature: TimeSignature = None,
                max_duration: float = None,
@@ -129,7 +128,7 @@ class Duration:
             #   esp depending on the BPM.
             return Duration(random_element(durations))
         else:
-            duration = random.random() * multiplier
+            duration = random.random() * factor
 
         return Duration(duration)
 
@@ -143,13 +142,13 @@ class Note:
         return f"Note<{self.pitch},{self.duration}>"
 
     @staticmethod
-    def random(duration_multiplier: float = 1,
-               bpm: int = None,
+    def random(bpm: int = None,
                time_signature: TimeSignature = None,
                max_duration: float = None,
+               duration_factor: float = 1,
                key_signature=None):
         pitch = Pitch.random(key_signature=key_signature)
-        duration = Duration.random(multiplier=duration_multiplier,
+        duration = Duration.random(factor=duration_factor,
                                    time_signature=time_signature,
                                    bpm=bpm,
                                    max_duration=max_duration)

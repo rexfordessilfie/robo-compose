@@ -38,12 +38,13 @@ def summer_fun_song(bars=4):
 
 
 def random_song(bars=4,
-                mode='chromatic',
+                mode='major',
                 root_frequency=440,
                 num_notes=8):
+
+    key_signature = KeySignature(pitch=Pitch(root_frequency), mode=mode)
     random_notes = [
-        Note.random(
-            key_signature=KeySignature(pitch=Pitch(root_frequency), mode=mode))
+        Note.random(key_signature=key_signature)
         for _ in range(num_notes)]
 
     for _ in range(bars):
@@ -65,7 +66,7 @@ def random_piece(bars=4,
                  mode='major',
                  root_frequency=440,
                  num_notes=12,
-                 bpm=120):
+                 bpm=80):
     root_pitch = Pitch(root_frequency)
     key_signature = KeySignature(pitch=root_pitch, mode=mode)
     time_signature = TimeSignature(4, NoteValue.QUARTER)
@@ -84,5 +85,5 @@ def random_piece(bars=4,
 
 
 if __name__ == '__main__':
-    random_piece()
+    random_song()
     pass
