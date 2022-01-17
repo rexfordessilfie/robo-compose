@@ -2,18 +2,43 @@ import copy
 import math
 import random
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, Generator, Tuple, List
 
-from composer.intervals import EqualTemperament, Interval
+from composer.intervals import EqualTemperament
 from composer.scales import ScaleFactory
+from composer.utils import next_element, previous_element
 
-# TODO: add 'tuning' parameter to pass tuning as argument everywhere EqualTemperament is used
 
+# TODO: add 'temperament' parameter to pass tuning as argument everywhere EqualTemperament is used
 
 class Accidental:
     FLAT = 'flat'
     NATURAL = 'natural'
     SHARP = 'sharp'
+
+    @staticmethod
+    def all(start: str = None):
+        """
+        Return accidentals in order of 'increase', with natural at 0
+        TODO: add support for micro-tonal accidentals?
+        """
+        default = [Accidental.FLAT,
+                   Accidental.NATURAL,
+                   Accidental.SHARP]
+        if start:
+            start_idx = default.index(start)
+            return default[start_idx:] + default[:start_idx]
+        return default
+
+    @staticmethod
+    def next(current: str):
+        accidentals = Accidental.all()
+        return next_element(current, accidentals, overlap_size=1)
+
+    @staticmethod
+    def prev(current: str):
+        accidentals = Accidental.all()
+        return previous_element(current, accidentals, overlap_size=1)
 
 
 class PitchClass:
@@ -26,7 +51,7 @@ class PitchClass:
     G = 'G'
 
     @staticmethod
-    def get_list(start: str = None):
+    def all(start: str = None):
         default = [PitchClass.A,
                    PitchClass.B,
                    PitchClass.C,
@@ -39,10 +64,56 @@ class PitchClass:
             return default[start_idx:] + default[:start_idx]
         return default
 
+    @staticmethod
+    def sharp(start: str = None):
+        """
+        Return pitch classes that can be sharpened according to Western music system
+        """
+        default = [PitchClass.A, PitchClass.C, PitchClass.D, PitchClass.F, PitchClass.G]
+        if start:
+            if start not in default:
+                raise ValueError('start pitch class does not have a sharp')
+            start_idx = default.index(start)
+            return default[start_idx:] + default[:start_idx]
+        return default
+
+    @staticmethod
+    def flat(start: str = None):
+        """
+        Return pitch classes that can be flattened according to Western music system
+        """
+        default = [PitchClass.A, PitchClass.B, PitchClass.D, PitchClass.E, PitchClass.G]
+        if start:
+            if start not in default:
+                raise ValueError('start pitch class does not have a flat')
+            start_idx = default.index(start)
+            return default[start_idx:] + default[:start_idx]
+        return default
+
+    @staticmethod
+    def next(current: str):
+        """
+        Get the next pitch class after current in Western Music system
+        TODO: make this an instance function? Allow for PitchClass('C').next()
+        """
+        pitch_classes = PitchClass.all()
+        curr_idx = pitch_classes.index(current)
+        idx = (curr_idx + 1) % len(pitch_classes)
+        return pitch_classes[idx]
+
+    @staticmethod
+    def prev(current: str):
+        """
+        Get the previous pitch class from current in Western Music system
+        """
+        pitch_classes = PitchClass.all()
+        curr_idx = pitch_classes.index(current)
+        idx = (curr_idx - 1 + len(pitch_classes)) % len(pitch_classes)
+        return pitch_classes[idx]
+
 
 @dataclass
 class PitchInfo:
-    # TODO: default register and accidental here to allow for PitchInfo(pitch_class=PitchClass.C).to_pitch() to work?
     frequency: int = None
     pitch_class: str = None
     accidental: str = None
@@ -50,7 +121,52 @@ class PitchInfo:
     enharmonic_pitch_class: str = None
     enharmonic_accidental: str = None
 
+    def next(self):
+        pitch_info = copy.deepcopy(self)
+        pitch_info.frequency = None
+
+        if pitch_info.accidental == Accidental.FLAT:
+            pitch_info.swap_enharmonic()
+
+        if pitch_info.pitch_class in PitchClass.sharp():
+            pitch_info.accidental = Accidental.next(pitch_info.accidental)
+
+        if pitch_info.accidental == Accidental.NATURAL:
+            pitch_info.pitch_class = PitchClass.next(pitch_info.pitch_class)
+
+        return pitch_info
+
+    def prev(self):
+        pitch_info = copy.deepcopy(self)
+        pitch_info.frequency = None
+
+        if pitch_info.accidental == Accidental.SHARP:
+            pitch_info.swap_enharmonic()
+
+        if pitch_info.pitch_class in PitchClass.flat():
+            pitch_info.accidental = Accidental.prev(pitch_info.accidental)
+
+        if pitch_info.accidental == Accidental.NATURAL:
+            pitch_info.pitch_class = PitchClass.prev(pitch_info.pitch_class)
+
+        return pitch_info
+
+    def fill_enharmonic(self):
+        if not self.enharmonic_pitch_class or not self.enharmonic_accidental:
+
+            if self.accidental == Accidental.SHARP:
+                self.enharmonic_pitch_class = PitchClass.next(self.pitch_class)
+                self.enharmonic_accidental = Accidental.FLAT
+
+            elif self.accidental == Accidental.FLAT:
+                self.enharmonic_pitch_class = PitchClass.prev(self.pitch_class)
+                self.enharmonic_accidental = Accidental.SHARP
+            else:
+                raise AttributeError(f"enharmonic not supported for accidental: {self.accidental}")
+
     def swap_enharmonic(self):
+        self.fill_enharmonic()
+
         if not self.enharmonic_pitch_class or not self.enharmonic_accidental:
             raise AttributeError('PitchInfo is missing enharmonic pitch class or accidental')
 
@@ -66,10 +182,9 @@ class PitchInfo:
                      enharmonic_accidental=self.enharmonic_accidental)
 
 
-"""
-List of chromatic pitches in the western music system.
-NB: at least one of these pitches must be complete.
-"""
+# List of chromatic pitches in the western music system.
+# NB: at least one of these pitches must be complete.
+# TODO: move this to constants file and with only dicts?
 CHROMATIC_PITCHES_INFO = [
     # Pitch<A,natural,4>
     PitchInfo(pitch_class=PitchClass.A,
@@ -152,7 +267,7 @@ def is_pitch_complete(p: PitchInfo):
     return p.pitch_class and p.accidental and p.frequency and p.register is not None
 
 
-def complete_pitch_info_generator(pitches_info=None):
+def complete_pitch_info_generator(pitches_info: List[PitchInfo] = None) -> Generator[Tuple[PitchInfo, int], None, None]:
     pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
     for idx, pitch_info in enumerate(pitches_info):
         if is_pitch_complete(pitch_info):
@@ -169,7 +284,8 @@ def is_matching_pitch_info(a: PitchInfo, b: PitchInfo):
     return (a.pitch_class == b.pitch_class and a.accidental == b.accidental) or is_enharmonic_match(a, b)
 
 
-def matching_pitch_info_generator(p: PitchInfo, pitches_info=None):
+def matching_pitch_info_generator(p: PitchInfo,
+                                  pitches_info: List[PitchInfo] = None) -> Generator[Tuple[PitchInfo, int], None, None]:
     pitches_info = pitches_info if pitches_info else CHROMATIC_PITCHES_INFO
     for idx, pitch_info in enumerate(pitches_info):
         if is_matching_pitch_info(p, pitch_info):
@@ -254,8 +370,9 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
 
 def frequency_from_pitch_info(pitch_info: PitchInfo):
     reference_pitch, reference_pitch_idx = next(complete_pitch_info_generator())
-    matching_pitch, matching_pitch_idx = next(matching_pitch_info_generator(PitchInfo(pitch_class=pitch_info.pitch_class,
-                                                                                      accidental=pitch_info.accidental)))
+    matching_pitch, matching_pitch_idx = next(
+        matching_pitch_info_generator(PitchInfo(pitch_class=pitch_info.pitch_class,
+                                                accidental=pitch_info.accidental)))
 
     num_semitones_from_reference = abs(matching_pitch_idx - reference_pitch_idx)
 
@@ -315,6 +432,12 @@ class Pitch(PitchInfo):
     def __str__(self):
         return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
 
+    def next(self):
+        return super(Pitch, self).next().to_pitch()
+
+    def prev(self):
+        return super(Pitch, self).prev().to_pitch()
+
     def matches(self,
                 other: 'Pitch',
                 tolerance=EqualTemperament.SEMITONE.value / 4
@@ -328,9 +451,6 @@ class Pitch(PitchInfo):
 
         extra_interval_decimal = octaves_interval % 1
         return extra_interval_decimal < tolerance
-
-    def pitch_at_interval(self, interval: Interval):
-        return Pitch(self.frequency * interval.value)
 
     @staticmethod
     def random(key=None):
@@ -359,3 +479,4 @@ class KeySignature:
 
 if __name__ == '__main__':
     print(Pitch('Gb8'))
+    print(Pitch(pitch_class=PitchClass.B, accidental=Accidental.FLAT, register=4).prev())
