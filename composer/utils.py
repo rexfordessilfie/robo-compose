@@ -1,4 +1,5 @@
 from typing import List, Any
+import random
 
 
 def next_wrap(current: Any, elements: List[Any], overlap_size: int = 0):
@@ -29,6 +30,13 @@ def prev_wrap(current: Any, elements: List[Any], overlap_size: int = 0):
     idx = current_idx - 1 - (overlap_size if inside_overlap else 0)
     idx = idx % len(elements)
     return elements[idx]
+
+
+def random_element(elements: List[Any]):
+    """
+    TODO: add weighted profile to be able to skew the result
+    """
+    return elements[random.randint(0, len(elements) - 1)]
 
 
 if __name__ == '__main__':

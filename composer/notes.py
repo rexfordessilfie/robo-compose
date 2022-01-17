@@ -1,8 +1,9 @@
 import copy
+import math
 import random
-from typing import List
 
 from composer.pitches import Pitch, PitchClass
+from composer.utils import random_element
 
 
 class NoteValue:
@@ -43,6 +44,10 @@ class NoteValue:
         return values.extend([2 ** -i * default[-1]
                               for i in range(len(default), size)])
 
+    @staticmethod
+    def more(start: float, size: int = 1):
+        return [2 ** -i * start for i in range(1, size + 1)]
+
 
 class TimeSignature:
     def __init__(self, num_beats: int, note_value: float):
@@ -53,18 +58,39 @@ class TimeSignature:
         return f"TimeSignature<{self.num_beats},{self.beat_value}>"
 
 
-def viable_durations_generator(note_values: List[float],
-                               bpm: float,
+def duration_from_note_value(note_value: float,
+                             bpm: float,
+                             beat_value: float):
+    beat_duration = 60 / bpm
+    num_beats_in_note_value = note_value / beat_value
+    return num_beats_in_note_value * beat_duration
+
+
+def note_value_from_duration(duration: float,
+                             bpm: float,
+                             beat_value: float):
+    beat_duration = 60 / bpm
+    return beat_duration * beat_value * duration
+
+
+def viable_durations_generator(bpm: float,
                                time_signature: TimeSignature,
-                               max_duration: float):
+                               max_duration: float = math.inf,
+                               max_note_value: float = None):
+    max_duration = duration_from_note_value(max_note_value, bpm, time_signature.beat_value) \
+        if max_note_value else max_duration
+
+    note_values = NoteValue.all()
+    note_values_min_duration = duration_from_note_value(min(note_values), bpm, time_signature.beat_value)
+
+    if max_duration and max_duration < note_values_min_duration:
+        note_values = NoteValue.more(max_duration, 5)
+
     for note_value in sorted(note_values):
-        duration = Duration.duration_from_note_value(note_value, bpm, time_signature)
-        if not max_duration:
+        duration = duration_from_note_value(note_value, bpm, time_signature.beat_value)
+        print(duration)
+        if (not max_duration) or duration <= max_duration:
             yield duration
-        elif duration < max_duration:
-            yield duration
-        else:
-            break
 
 
 class Duration:
@@ -79,7 +105,7 @@ class Duration:
         else:
             self.bpm = bpm
             self.note_value = note_value
-            self.value = Duration.duration_from_note_value(note_value, bpm, time_signature)
+            self.value = duration_from_note_value(note_value, bpm, time_signature.beat_value)
 
     def __repr__(self) -> str:
         return f"Duration<{self.value}>"
@@ -88,28 +114,20 @@ class Duration:
         pass
 
     @staticmethod
-    def duration_from_note_value(note_value: float,
-                                 bpm: float,
-                                 time_signature: TimeSignature):
-        beat_duration = 60 / bpm
-        num_beats_in_note_value = note_value / time_signature.beat_value
-        return num_beats_in_note_value * beat_duration
-
-    @staticmethod
     def random(multiplier: float = 1,
                bpm: int = None,
                time_signature: TimeSignature = None,
-               max_duration: float = None):
+               max_duration: float = None,
+               max_note_value: float = None):
         """
         TODO: get a random duration and return it. If quantized then return something that aligns to a specific
         division of the beat or bpm. Consider time signature??
         """
         if bpm and time_signature:
-            note_values = NoteValue.all()
-            durations = list(viable_durations_generator(note_values, bpm, time_signature, max_duration))
+            durations = list(viable_durations_generator(bpm, time_signature, max_duration, max_note_value))
             # TODO: weighted random. Weight notes in the middle more compared to whole notes and really fast notes.
             #   esp depending on the BPM.
-            duration = durations[random.randint(0, len(durations) - 1)]
+            return Duration(random_element(durations))
         else:
             duration = random.random() * multiplier
 
