@@ -17,8 +17,12 @@ class NoteValue:
     def __init__(self, value):
         self.value = value
 
-    def dot(self):
-        return self.value * 1.5
+    def __repr__(self) -> str:
+        return f"NoteValue<{self.value}>"
+
+    def dot(self, count: int = 1):
+        multiplier = sum([2 ** -i for i in range(0, count + 1)])
+        return NoteValue(multiplier * self.value)
 
     @staticmethod
     def all(size: int = None):
@@ -45,12 +49,14 @@ class TimeSignature:
         self.num_beats = num_beats
         self.beat_value = note_value
 
+    def __repr__(self) -> str:
+        return f"TimeSignature<{self.num_beats},{self.beat_value}>"
+
 
 def viable_durations_generator(note_values: List[float],
                                bpm: float,
                                time_signature: TimeSignature,
                                max_duration: float):
-
     for note_value in sorted(note_values):
         duration = Duration.duration_from_note_value(note_value, bpm, time_signature)
         if not max_duration:
@@ -124,7 +130,6 @@ class Note:
                time_signature: TimeSignature = None,
                max_duration: float = None,
                key_signature=None):
-
         pitch = Pitch.random(key_signature=key_signature)
         duration = Duration.random(multiplier=duration_multiplier,
                                    time_signature=time_signature,
@@ -137,3 +142,5 @@ class Note:
 if __name__ == '__main__':
     print(PitchClass.all(start=PitchClass.E))
     print(Pitch(440).matches(Pitch(440 * 1.2)))
+
+    print(NoteValue(NoteValue.WHOLE).dot(1))
