@@ -378,7 +378,7 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
     # TODO: maybe get more specific about this rounding? What tolerance are we willing to accept when there are extra
     #   decimals?
     num_semitones_from_reference = round(
-        math.log(normalized_interval, EqualTemperament.SEMITONE.value)
+        math.log(normalized_interval, EqualTemperament.MINOR_SECOND.value)
     )
 
     final_pitch_idx = (reference_pitch_idx +
@@ -406,7 +406,7 @@ def frequency_from_pitch_info(pitch_info: PitchInfo):
 
     octave_difference = pitch_info.register - matching_pitch.register
 
-    base_frequency = reference_pitch.frequency * (EqualTemperament.SEMITONE.value ** num_semitones_from_reference)
+    base_frequency = reference_pitch.frequency * (EqualTemperament.MINOR_SECOND.value ** num_semitones_from_reference)
 
     final_frequency = base_frequency * (EqualTemperament.OCTAVE.value ** octave_difference)
     return final_frequency

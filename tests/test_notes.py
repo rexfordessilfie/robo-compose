@@ -43,7 +43,7 @@ def test_random_duration_with_max_duration():
                                       max_duration=max_duration)
     print(random_duration.value)
     assert isinstance(random_duration, Duration)
-    assert random_duration.value < max_duration
+    assert random_duration.value <= max_duration
 
 
 def test_random_note():
