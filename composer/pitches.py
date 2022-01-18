@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import Union, Generator, Tuple, List
 
 from composer.intervals import EqualTemperament
-from composer.scales import ScaleFactory
-from composer.utils import next_wrap, prev_wrap
+from composer.scales import ScaleFactory, ScaleMode
+from composer.utils import next_wrap, prev_wrap, random_element
 
 
 # TODO: add 'temperament' parameter to pass tuning as argument everywhere EqualTemperament is used
@@ -130,6 +130,8 @@ class PitchInfo:
 
         if pitch_info.accidental == Accidental.NATURAL:
             pitch_info.pitch_class = PitchClass.next(pitch_info.pitch_class)
+
+        # TODO: update register as well
 
         return pitch_info
 
@@ -476,26 +478,31 @@ class Pitch(PitchInfo):
         """
         interval = other.frequency / self.frequency
         octaves_interval = abs(math.log(interval, 2))
-
         extra_interval_decimal = octaves_interval % 1
         return extra_interval_decimal < tolerance
 
     @staticmethod
-    def random(key_signature=None):
+    def random(key_signature: 'KeySignature' = None, register: int = None):
         if key_signature and isinstance(key_signature, KeySignature):
-            scale = key_signature.get_scale()
+            scale = key_signature.scale
             random_index = random.randrange(0, len(scale))
-            return scale[random_index]
+            return scale[random_index].to_pitch()
         else:
-            raise ValueError('invalid key signature')
+            pitch_class = random_element(PitchClass.all())
+            register = register if register else random_element(list(range(2, 6)))  # roughly range of 88-key keyboard
+            accidental = random_element([Accidental.FLAT, Accidental.NATURAL]) if pitch_class in PitchClass.flat() \
+                else random_element([Accidental.SHARP, Accidental.NATURAL]) if pitch_class in PitchClass.sharp() \
+                else Accidental.NATURAL
+            return Pitch(pitch_class=pitch_class, accidental=accidental, register=register)
 
 
 class KeySignature:
-    def __init__(self, pitch: Pitch, mode):
+    def __init__(self, pitch: Pitch, mode: ScaleMode):
         self.pitch = pitch
         self.mode = mode
 
-    def get_scale(self):
+    @property
+    def scale(self):
         return list(map(Pitch, ScaleFactory.get_scale(self.pitch.frequency,
                                                       self.mode)))
 
