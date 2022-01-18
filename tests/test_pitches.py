@@ -7,6 +7,8 @@ from composer.pitches import PitchClass, PitchInfo, Accidental, Pitch, KeySignat
     complete_pitch_info_generator, is_pitch_complete, is_matching_pitch_info, matching_pitch_info_generator, \
     is_enharmonic_match, pitch_info_from_pitch_string, pitch_info_from_frequency
 
+from composer.scales import ScaleMode
+
 
 def test_pitch_class_size():
     assert len(PitchClass.all()) == 7
@@ -179,7 +181,7 @@ def test_pitch_matches_other():
 
 
 def test_random_pitch():
-    random_pitch = Pitch.random(key_signature=KeySignature(pitch=Pitch(440), mode='major'))
+    random_pitch = Pitch.random(key_signature=KeySignature(pitch=Pitch(440), mode=ScaleMode.MAJOR))
     assert isinstance(random_pitch, Pitch)
     assert is_pitch_complete(random_pitch)
 

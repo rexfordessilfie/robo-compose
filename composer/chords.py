@@ -1,5 +1,7 @@
+from abc import ABC
+
 from composer.intervals import Temperament, EqualTemperament
-from composer.scales import ScaleBuilder
+from composer.scales import ScaleBuilder, Scale
 import re
 
 
@@ -15,13 +17,8 @@ class ChordQuality:
     AUGMENTED = 'aug'
 
 
-class Chord:
-    def __init__(self, temperament: Temperament = EqualTemperament):
-        self.temperament = temperament
-
-    @property
-    def intervals(self):
-        raise NotImplementedError()
+class Chord(Scale, ABC):
+    pass
 
 
 class MajorChord(Chord):

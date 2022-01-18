@@ -3,6 +3,7 @@ import sys
 
 from composer.notes import Duration, NoteValue, Note, TimeSignature, duration_from_note_value, note_value_from_duration
 from composer.pitches import KeySignature, Pitch
+from composer.scales import ScaleMode
 
 
 def test_duration_from_note_value():
@@ -47,10 +48,8 @@ def test_random_duration_with_max_duration():
 
 
 def test_random_note():
-    note = Note.random(duration_factor=1,
-                       bpm=60,
-                       time_signature=TimeSignature(4, NoteValue.QUARTER),
-                       key_signature=KeySignature(pitch=Pitch(440), mode='major'))
+    note = Note.random(key_signature=KeySignature(pitch=Pitch(440), mode=ScaleMode.MAJOR),
+                       time_signature=TimeSignature(4, NoteValue.QUARTER), bpm=60, duration_factor=1)
 
     assert isinstance(note, Note)
     assert isinstance(note.pitch, Pitch)

@@ -1,8 +1,9 @@
 from typing import List
+from enum import Enum
 from composer.intervals import EqualTemperament, Interval, Temperament
 
 
-class ScaleMode:
+class ScaleMode(Enum):
     MAJOR = 'major'
     MINOR = 'minor'
     CHROMATIC = 'chromatic'
@@ -18,6 +19,7 @@ class Scale:
 
 
 class MajorScale(Scale):
+    @property
     def intervals(self):
         return [self.temperament.UNISON, self.temperament.MAJOR_SECOND, self.temperament.MAJOR_THIRD,
                 self.temperament.PERFECT_FOURTH, self.temperament.PERFECT_FIFTH, self.temperament.MAJOR_SIXTH,
@@ -25,6 +27,7 @@ class MajorScale(Scale):
 
 
 class MinorScale(Scale):
+    @property
     def intervals(self):
         return [self.temperament.UNISON, self.temperament.MAJOR_SECOND, self.temperament.MINOR_THIRD,
                 self.temperament.PERFECT_FOURTH, self.temperament.PERFECT_FIFTH, self.temperament.MINOR_SIXTH,
@@ -32,8 +35,9 @@ class MinorScale(Scale):
 
 
 class ChromaticScale(Scale):
+    @property
     def intervals(self):
-        return self.temperament.all()
+        return self.temperament.intervals
 
 
 class ScaleBuilder:
@@ -78,25 +82,25 @@ class ScaleFactory:
     """Exposes functions to get a scale builder or to build a scale and return it."""
 
     @classmethod
-    def get_scale_builder(cls, mode, temperament: Temperament = EqualTemperament) -> ScaleBuilder:
+    def get_scale_builder(cls, mode: ScaleMode, temperament: Temperament = EqualTemperament) -> ScaleBuilder:
         if mode == ScaleMode.MAJOR:
-            return ScaleBuilder(interval_list=MajorScale(temperament).intervals(),
+            return ScaleBuilder(interval_list=MajorScale(temperament).intervals,
                                 intervals_relative_to_start=True)
 
         if mode == ScaleMode.MINOR:
-            return ScaleBuilder(interval_list=MinorScale(temperament).intervals(),
+            return ScaleBuilder(interval_list=MinorScale(temperament).intervals,
                                 intervals_relative_to_start=True)
 
         if mode == ScaleMode.CHROMATIC:
-            return ScaleBuilder(interval_list=ChromaticScale(temperament).intervals(),
+            return ScaleBuilder(interval_list=ChromaticScale(temperament).intervals,
                                 intervals_relative_to_start=True)
 
     @classmethod
-    def get_scale(cls, start_frequency, mode) -> List[float]:
-        scale_builder = cls.get_scale_builder(mode)
+    def get_scale(cls, start_frequency, mode: ScaleMode, temperament: Temperament = EqualTemperament) -> List[float]:
+        scale_builder = cls.get_scale_builder(mode, temperament)
         scale = scale_builder.build(start_frequency)
         return scale
 
 
 if __name__ == '__main__':
-    print(ScaleFactory.get_scale(440, 'chromatic'))
+    print(ScaleFactory.get_scale(440, ScaleMode.CHROMATIC))

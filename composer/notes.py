@@ -2,7 +2,7 @@ import copy
 import math
 import random
 
-from composer.pitches import Pitch, PitchClass
+from composer.pitches import Pitch, PitchClass, KeySignature
 from composer.utils import random_element
 
 
@@ -142,11 +142,11 @@ class Note:
         return f"Note<{self.pitch},{self.duration}>"
 
     @staticmethod
-    def random(bpm: int = None,
+    def random(key_signature: KeySignature = None,
                time_signature: TimeSignature = None,
+               bpm: int = None,
                max_duration: float = None,
-               duration_factor: float = 1,
-               key_signature=None):
+               duration_factor: float = 1):
         pitch = Pitch.random(key_signature=key_signature)
         duration = Duration.random(factor=duration_factor,
                                    time_signature=time_signature,

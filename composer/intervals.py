@@ -41,7 +41,7 @@ class Interval:
 # TODO: make this inherit from Temperament so we can talk about intervals without knowing the specific one being used
 class Temperament:
     def __init__(self, intervals: List[Interval]):
-        self.intervals = intervals
+        self._intervals = intervals
         self.UNISON = intervals[0]
         self.MINOR_SECOND = intervals[1]
         self.MAJOR_SECOND = intervals[2]
@@ -81,8 +81,9 @@ class Temperament:
             'b13': self.OCTAVE * self.MINOR_SIXTH,
         }
 
-    def all(self):
-        return self.intervals
+    @property
+    def intervals(self):
+        return self._intervals
 
     def named_interval(self, name: str):
         return self.__dict__.get(name, None) or self._aliases.get(name, None)
@@ -106,4 +107,3 @@ def flatten(value: float,
             amount: Interval = EqualTemperament.MINOR_SECOND,
             count: int = 1):
     return value * Interval(amount.value ** count).inverse
-

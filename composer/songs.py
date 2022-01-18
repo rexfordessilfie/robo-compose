@@ -56,7 +56,7 @@ def random_song(bars=4,
 def scale_song(bars=1,
                mode=ScaleMode.MAJOR,
                root_frequency=440):
-    scale = KeySignature(pitch=Pitch(root_frequency), mode=mode).get_scale()
+    scale = KeySignature(pitch=Pitch(root_frequency), mode=mode).scale
 
     for _ in range(bars):
         Tone.play_melody(scale)
@@ -73,9 +73,7 @@ def random_piece(bars=4,
     time_signature = TimeSignature(4, NoteValue.QUARTER)
 
     random_notes = [
-        Note.random(key_signature=key_signature,
-                    time_signature=time_signature,
-                    bpm=bpm)
+        Note.random(key_signature=key_signature, time_signature=time_signature, bpm=bpm)
         for _ in range(num_notes)]
 
     print(random_notes)
