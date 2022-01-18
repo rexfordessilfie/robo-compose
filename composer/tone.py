@@ -5,6 +5,10 @@ from composer.pitches import Pitch
 from synthesizer import Player, Synthesizer, Waveform
 
 
+# TODO: extend this class and make it subclass-able. Each will be instantiated with an instrument name/waveform
+#   This way we can have something like PianoTone(instrument='piano'), ViolinTone(instrument='violin'), and then
+#   the class will instantiate a synthesizer that uses a piano tone.
+
 class Tone:
     player = Player()
     synthesizer = Synthesizer(osc1_waveform=Waveform.triangle,
@@ -27,7 +31,7 @@ class Tone:
             else None
 
     @classmethod
-    def get_duration(cls, o: object, default: float = None):
+    def get_duration(cls, o: Union[float, Duration, Note], default: float = None):
         return o.duration.value if isinstance(o, Note) \
             else o.value if isinstance(o, Duration) \
             else default
@@ -52,7 +56,7 @@ class Tone:
         cls.player.play_wave(wave)
 
     @classmethod
-    def play_melody(cls, notes: List[Union[float, Pitch]] = None, duration: float = 1):
+    def play_melody(cls, notes: List[Union[float, Pitch, Note]] = None, duration: float = 1):
         _frequencies = [cls.get_frequency(note) for note in notes]
         _durations = [cls.get_duration(note, duration) for note in notes]
 
@@ -60,6 +64,6 @@ class Tone:
             cls.play_note(_frequencies[i], _durations[i])
 
     @classmethod
-    def play_progression(cls, chords: List[List[Union[float, Pitch]]] = None, duration: float = 1):
+    def play_progression(cls, chords: List[List[Union[float, Pitch, Note]]] = None, duration: float = 1):
         for i in range(len(chords)):
             cls.play_chord(chords[i], duration)
