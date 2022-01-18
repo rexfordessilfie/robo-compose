@@ -1,9 +1,10 @@
 import time
 from composer.tone import Tone
-from composer.chords import ChordFactory
-from composer.intervals import EqualTemperament
+from composer.chords import ChordFactory, ChordQuality
+from composer.intervals import EqualTemperament, sharpen, flatten
 from composer.pitches import Pitch, KeySignature
 from composer.notes import Note, TimeSignature, NoteValue
+from composer.scales import ScaleMode
 
 
 def rest(duration=0.005):
@@ -15,18 +16,18 @@ def slider_song(bars=4):
     for _ in range(bars):
         Tone.play_progression(
             [chord,
-             map(EqualTemperament.sharpen, chord),
-             map(EqualTemperament.flatten, chord),
-             map(EqualTemperament.flatten, chord),
-             map(EqualTemperament.flatten, chord),
-             map(EqualTemperament.flatten, chord)])
+             map(sharpen, chord),
+             map(flatten, chord),
+             map(flatten, chord),
+             map(flatten, chord),
+             map(flatten, chord)])
         rest(0.005)
 
 
 def summer_fun_song(bars=4):
-    chord1 = ChordFactory.get_chord(440, 'M')
-    chord2 = ChordFactory.get_chord(440 * EqualTemperament.P4, 'M')
-    chord3 = ChordFactory.get_chord(440 * EqualTemperament.P5, 'M')
+    chord1 = ChordFactory.get_chord(440, ChordQuality.MAJOR)
+    chord2 = ChordFactory.get_chord(440 * EqualTemperament.PERFECT_FOURTH, ChordQuality.MAJOR)
+    chord3 = ChordFactory.get_chord(440 * EqualTemperament.PERFECT_FIFTH, ChordQuality.MAJOR)
 
     for _ in range(bars):
         Tone.play_progression(
@@ -38,7 +39,7 @@ def summer_fun_song(bars=4):
 
 
 def random_song(bars=4,
-                mode='major',
+                mode=ScaleMode.MAJOR,
                 root_frequency=440,
                 num_notes=8):
 
@@ -53,7 +54,7 @@ def random_song(bars=4,
 
 
 def scale_song(bars=1,
-               mode='major',
+               mode=ScaleMode.MAJOR,
                root_frequency=440):
     scale = KeySignature(pitch=Pitch(root_frequency), mode=mode).get_scale()
 
@@ -63,7 +64,7 @@ def scale_song(bars=1,
 
 
 def random_piece(bars=4,
-                 mode='major',
+                 mode=ScaleMode.MAJOR,
                  root_frequency=440,
                  num_notes=12,
                  bpm=80):
@@ -85,5 +86,5 @@ def random_piece(bars=4,
 
 
 if __name__ == '__main__':
-    random_song()
+    summer_fun_song()
     pass

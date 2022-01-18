@@ -1,8 +1,9 @@
-from typing import Union
+from typing import Union, List
 
 
 class Interval:
     """TODO: extend built-in float?"""
+
     def __init__(self, value: float):
         self.value = float(value)
         self.inverse = float(1 / value)
@@ -38,102 +39,71 @@ class Interval:
 
 
 # TODO: make this inherit from Temperament so we can talk about intervals without knowing the specific one being used
+class Temperament:
+    def __init__(self, intervals: List[Interval]):
+        self.intervals = intervals
+        self.UNISON = intervals[0]
+        self.MINOR_SECOND = intervals[1]
+        self.MAJOR_SECOND = intervals[2]
+        self.MINOR_THIRD = intervals[3]
+        self.MAJOR_THIRD = intervals[4]
+        self.PERFECT_FOURTH = intervals[5]
+        self.TRITONE = intervals[6]
+        self.PERFECT_FIFTH = intervals[7]
+        self.MINOR_SIXTH = intervals[8]
+        self.MAJOR_SIXTH = intervals[9]
+        self.MINOR_SEVENTH = intervals[10]
+        self.MAJOR_SEVENTH = intervals[11]
+        self.OCTAVE = Interval(2)
 
-class EqualTemperament:
-    base = 2 ** (1 / 12)
+        self.DIMINISHED_FIFTH = self.AUGMENTED_FOURTH = self.TRITONE
 
-    UNISON = Interval(base ** 0)
+        self._aliases = {
+            'm2': self.MINOR_SECOND,
+            'M2': self.MAJOR_SECOND,
+            'm3': self.MINOR_THIRD,
+            'M3': self.MAJOR_THIRD,
+            'P4': self.PERFECT_FOURTH,
+            '#4': self.TRITONE,
+            'b5': self.TRITONE,
+            'P5': self.PERFECT_FIFTH,
+            'b6': self.MINOR_SIXTH,
+            'm6': self.MINOR_SIXTH,
+            'M6': self.MAJOR_SIXTH,
+            'b7': self.MINOR_SEVENTH,
+            'm7': self.MINOR_SEVENTH,
+            'M7': self.MAJOR_SEVENTH,
+            'b9': self.OCTAVE * self.MINOR_SECOND,
+            'M9': self.OCTAVE * self.MAJOR_SECOND,
+            'M11': self.OCTAVE * self.PERFECT_FOURTH,
+            '#11': self.OCTAVE * self.TRITONE,
+            'M13': self.OCTAVE * self.MAJOR_SIXTH,
+            'b13': self.OCTAVE * self.MINOR_SIXTH,
+        }
 
-    MINOR_SECOND = m2 = Interval(base ** 1)
-    MAJOR_SECOND = M2 = Interval(base ** 2)
+    def all(self):
+        return self.intervals
 
-    MINOR_THIRD = m3 = Interval(base ** 3)
-    MAJOR_THIRD = M3 = Interval(base ** 4)
-
-    PERFECT_FOURTH = P4 = Interval(base ** 5)
-
-    TRITONE = Interval(base ** 6)
-    DIMINISHED_FIFTH = D5 = TRITONE
-    AUGMENTED_FOURTH = A4 = TRITONE
-
-    PERFECT_FIFTH = P5 = Interval(base ** 7)
-
-    MINOR_SIXTH = m6 = Interval(base ** 8)
-    MAJOR_SIXTH = M6 = Interval(base ** 9)
-
-    MINOR_SEVENTH = m7 = Interval(base ** 10)
-    MAJOR_SEVENTH = M7 = Interval(base ** 11)
-
-    OCTAVE = Interval(base ** 12)
-
-    TONE = MAJOR_SECOND
-    SEMITONE = MINOR_SECOND
-
-    @classmethod
-    def sharpen(cls, interval: Interval = None, frequency: int = None, count: int = 1):
-        final_interval = Interval(cls.base ** count)
-
-        if interval:
-            return interval * final_interval
-
-        if frequency:
-            return frequency * final_interval.value
-
-    @classmethod
-    def flatten(cls, interval: Interval = None, frequency: int = None, count: int = 1):
-        final_interval = Interval(cls.base ** count)
-
-        if interval:
-            return interval * final_interval.inverse
-
-        if frequency:
-            return frequency * final_interval.inverse
+    def named_interval(self, name: str):
+        return self.__dict__.get(name, None) or self._aliases.get(name, None)
 
 
-class JustIntonation:
-    UNISON = Interval(1)
+EqualTemperament = Temperament([Interval(2 ** (i / 12)) for i in range(0, 12)])
 
-    MINOR_SECOND = m2 = Interval(25 / 24)
-    MAJOR_SECOND = M2 = Interval(9 / 8)
+JustIntonation = Temperament([Interval(1), Interval(25 / 24), Interval(9 / 8),
+                              Interval(6 / 5), Interval(5 / 4), Interval(4 / 3),
+                              Interval(45 / 32), Interval(3 / 2), Interval(8 / 5),
+                              Interval(5 / 3), Interval(9 / 5), Interval(15 / 8)])
 
-    MINOR_THIRD = m3 = Interval(6 / 5)
-    MAJOR_THIRD = M3 = Interval(5 / 4)
 
-    PERFECT_FOURTH = P4 = Interval(4 / 3)
+def sharpen(value: float,
+            amount: Interval = EqualTemperament.MINOR_SECOND,
+            count: int = 1):
+    return value * Interval(amount.value ** count).value
 
-    TRITONE = Interval(45 / 32)
-    DIMINISHED_FIFTH = D5 = TRITONE
-    AUGMENTED_FOURTH = A4 = TRITONE
 
-    PERFECT_FIFTH = P5 = Interval(3 / 2)
+def flatten(value: float,
+            amount: Interval = EqualTemperament.MINOR_SECOND,
+            count: int = 1):
+    return value * Interval(amount.value ** count).inverse
 
-    MINOR_SIXTH = m6 = Interval(8 / 5)
-    MAJOR_SIXTH = M6 = Interval(5 / 3)
-
-    MINOR_SEVENTH = m7 = Interval(9 / 5)
-    MAJOR_SEVENTH = M7 = Interval(15 / 8)
-
-    OCTAVE = Interval(2)
-
-    TONE = MAJOR_SECOND
-    SEMITONE = MINOR_SECOND
-
-    @classmethod
-    def sharpen(cls, interval: Interval = None, frequency: int = None, count: int = 1):
-        final_interval = Interval(cls.m2.value ** count)
-
-        if interval:
-            return interval * final_interval
-
-        if frequency:
-            return frequency * final_interval.value
-
-    @classmethod
-    def flatten(cls, interval: Interval = None, frequency: int = None, count: int = 1):
-        final_interval = Interval(cls.m2.value ** count)
-
-        if interval:
-            return interval * final_interval.inverse
-
-        if frequency:
-            return frequency * final_interval.inverse

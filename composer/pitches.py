@@ -468,7 +468,7 @@ class Pitch(PitchInfo):
 
     def matches(self,
                 other: 'Pitch',
-                tolerance=EqualTemperament.SEMITONE.value / 4
+                tolerance=EqualTemperament.MINOR_SECOND.value / 4
                 ) -> bool:
         """
         Two pitches are a match if one pitch's frequency can be expressed
