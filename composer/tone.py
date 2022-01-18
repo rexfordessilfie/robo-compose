@@ -62,4 +62,4 @@ class Tone:
     @classmethod
     def play_progression(cls, chords: List[List[Union[float, Pitch]]] = None, duration: float = 1):
         for i in range(len(chords)):
-            cls.play_chord(chords[i])
+            cls.play_chord(chords[i], duration)
