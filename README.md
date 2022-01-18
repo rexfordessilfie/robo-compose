@@ -77,8 +77,8 @@ duration_for_quarter_note = Duration(note_value=NoteValue.QUARTER,
                                      bpm=60)
 
 # Access Duration in seconds
-assert duration_3_seconds == 3 # True
-assert duration_for_quarter_note == 1 # True
+assert duration_3_seconds.value == 3 # True
+assert duration_for_quarter_note.value == 1 # True
 ```
 After a `Duration` has been created, the raw time value in seconds can be obtained by accessing `.value` property.
 Future work may add support to normalize a duration in seconds to a Western music note value equivalent.
