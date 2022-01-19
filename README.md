@@ -1,7 +1,11 @@
 # robo-compose
 Robo-compose is a fun Python project for creating random melodies for compositional inspiration. 
 Robo-compose also contains some utility classes and functions that model musical concepts in an object-oriented style, 
-and allow for musical programming.
+and allow for musical programming. 
+
+This project was inspired by a desire to create musical ideas, and to practice design patterns and OOP in Python. 
+So far it has evolved into more, and I hope to continue to implement more features and ideas as they come.
+First, some definitions of classes defined and used within the project.
 
 # Definitions
 The `composer` package contains the following classes:
@@ -14,7 +18,7 @@ or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
 Note values include, whole note (1), half note (1/2), quarter note (1/4) etc.
 * `TimeSignature`: This is a Western music time signature identified by a combination of
 number of beats and the note value of a beat.
-* `Interval`: a number denoting the relative distance between two frequencies. Common intervals in Western
+* `Interval`: A number denoting the relative distance between two frequencies. Common intervals in Western
 Music include, the perfect fifth (3/2), octave (2/1) and more.
 * `Temperament`: This a Western Music tuning system identified by a list of intervals.
 Examples include equal temperament, and just-intonation.
@@ -142,3 +146,14 @@ Tone.play_melody(melody)
 chord = ChordFactory.get_chord(Pitch("C5#").frequency, "MM7")
 Tone.play_chord(chord)
 ```
+
+
+# Future Work
+I plan on working on some more features to add to this project to make it more useful for composition and musical programming. Some ideas include:
+1. Conversion of generated compositions to wav files, and to MIDI for use in MuseScore or DAWs
+2. Generating random chord progressions
+3. Heuristic/probabilistic-based random melodies
+4. Improve modeling for songs/pieces for multi-part composition
+5. Harmonic analysis!
+
+Ideas and feature requests are welcome!
