@@ -21,8 +21,6 @@ def slider_song(bars=4):
                    list(map(flatten, chord)),
                    list(map(flatten, chord))]
 
-    Tone.write_progression('slider_song.wav', progression)
-
     for _ in range(bars):
         Tone.play_progression(progression)
         rest(0.005)
@@ -37,8 +35,6 @@ def summer_fun_song(bars=4):
                    chord1,
                    chord2,
                    chord3]
-
-    Tone.write_progression('summer_fun_song.wav', progression)
 
     for _ in range(bars):
         Tone.play_progression(progression)
@@ -55,7 +51,8 @@ def random_song(bars=4,
         for _ in range(num_notes)]
 
     timestamp = filename_timestamp()
-    Tone.write_melody(f"random_song{timestamp}.wav", random_notes)
+    Tone.write_wav_melody(f"random_song{timestamp}.wav", random_notes)
+    Tone.write_wav_melody(f"random_song{timestamp}.mid", random_notes)
 
     for _ in range(bars):
         Tone.play_melody(random_notes)
@@ -84,6 +81,10 @@ def random_piece(bars=4,
     random_notes = [
         Note.random(key_signature=key_signature, time_signature=time_signature, bpm=bpm)
         for _ in range(num_notes)]
+
+    timestamp = filename_timestamp()
+    Tone.write_wav_melody(f"random_piece{timestamp}.wav", random_notes)
+    Tone.write_wav_melody(f"random_piece{timestamp}.mid", random_notes)
 
     for _ in range(bars):
         Tone.play_melody(random_notes)

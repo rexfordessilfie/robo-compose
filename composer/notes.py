@@ -96,21 +96,22 @@ class Duration:
     def __init__(self,
                  seconds: float = None,
                  note_value: float = None,
-                 bpm: int = None,
+                 bpm: int = None, # reconsider defaults. Maybe we want a default time signature too?
                  time_signature: TimeSignature = None):
+
+        self.bpm = bpm
+        self.time_signature = time_signature
+        self.seconds = seconds
+        self.note_value = note_value
+        self.value = None
 
         if seconds is not None:
             self.value = seconds
         else:
-            self.bpm = bpm
-            self.note_value = note_value
             self.value = duration_from_note_value(note_value, bpm, time_signature.beat_value)
 
     def __repr__(self) -> str:
         return f"Duration<{self.value}>"
-
-    def set_bpm(self, bpm: float):
-        pass
 
     @staticmethod
     def random(factor: float = 1,
@@ -159,5 +160,4 @@ class Note:
 if __name__ == '__main__':
     print(PitchClass.all(start=PitchClass.E))
     print(Pitch(440).matches(Pitch(440 * 1.2)))
-
     print(NoteValue(NoteValue.WHOLE).dot(1))

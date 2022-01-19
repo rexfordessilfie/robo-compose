@@ -2,3 +2,4 @@ synthesizer==0.2.0
 PyAudio==0.2.11
 pytest==6.2.5
 numpy==1.22.1
+MIDIUtil==1.2.1
