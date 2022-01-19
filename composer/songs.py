@@ -1,7 +1,7 @@
 import time
 from composer.tone import Tone
 from composer.chords import ChordFactory, ChordQuality
-from composer.intervals import EqualTemperament, sharpen, flatten
+from composer.intervals import EqualTemperament12, sharpen, flatten
 from composer.pitches import Pitch, KeySignature
 from composer.notes import Note, TimeSignature, NoteValue
 from composer.scales import ScaleMode
@@ -26,8 +26,8 @@ def slider_song(bars=4):
 
 def summer_fun_song(bars=4):
     chord1 = ChordFactory.get_chord(440, ChordQuality.MAJOR)
-    chord2 = ChordFactory.get_chord(440 * EqualTemperament.PERFECT_FOURTH, ChordQuality.MAJOR)
-    chord3 = ChordFactory.get_chord(440 * EqualTemperament.PERFECT_FIFTH, ChordQuality.MAJOR)
+    chord2 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FOURTH, ChordQuality.MAJOR)
+    chord3 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FIFTH, ChordQuality.MAJOR)
 
     for _ in range(bars):
         Tone.play_progression(

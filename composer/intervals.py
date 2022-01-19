@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Tuple
 
 
 class Interval:
@@ -37,11 +37,37 @@ class Interval:
 
 # Interval Definitions
 
-
-# TODO: make this inherit from Temperament so we can talk about intervals without knowing the specific one being used
 class Temperament:
+    def __init__(self, intervals: List[Interval], intervals_12_indexes: Tuple[int] = None):
+        self.intervals = intervals
+        self.intervals_12_indexes = list(range(12)) if len(intervals) == 12 else intervals_12_indexes
+        self._aliases = {}
+        self._intervals_12 = None
+
+    def aliased_interval(self, name: str) -> Interval:
+        return self._aliases.get(name, None)
+
+    @property
+    def intervals_12(self):
+        if len(self.intervals) < 12 or not self.intervals_12_indexes:
+            raise AttributeError(f"{self.__class__.__name__} does not support twelve tone intervals")
+
+        if not self._intervals_12:
+            self._intervals_12 = TwelveToneTemperament([self.intervals[i] for i in self.intervals_12_indexes]) \
+                if self.intervals_12_indexes else None
+
+        return self._intervals_12
+
+
+class TwelveToneTemperament(Temperament):
     def __init__(self, intervals: List[Interval]):
-        self._intervals = intervals
+        super().__init__(intervals=intervals, intervals_12_indexes=tuple(range(12)))
+
+        intervals_size = len(intervals)
+        if intervals_size != 12:
+            raise ValueError(f"Invalid intervals size for initializing {self.__class__.__name__}. Expected 12, "
+                             f"but got {intervals_size}")
+
         self.UNISON = intervals[0]
         self.MINOR_SECOND = intervals[1]
         self.MAJOR_SECOND = intervals[2]
@@ -82,28 +108,30 @@ class Temperament:
         }
 
     @property
-    def intervals(self):
-        return self._intervals
-
-    def named_interval(self, name: str):
-        return self.__dict__.get(name, None) or self._aliases.get(name, None)
+    def intervals_12(self):
+        return self
 
 
-EqualTemperament = Temperament([Interval(2 ** (i / 12)) for i in range(0, 12)])
+EqualTemperament12 = TwelveToneTemperament([Interval(2 ** (i / 12)) for i in range(0, 12)])
 
-JustIntonation = Temperament([Interval(1), Interval(25 / 24), Interval(9 / 8),
-                              Interval(6 / 5), Interval(5 / 4), Interval(4 / 3),
-                              Interval(45 / 32), Interval(3 / 2), Interval(8 / 5),
-                              Interval(5 / 3), Interval(9 / 5), Interval(15 / 8)])
+JustIntonation = TwelveToneTemperament([Interval(1), Interval(25 / 24), Interval(9 / 8),
+                                        Interval(6 / 5), Interval(5 / 4), Interval(4 / 3),
+                                        Interval(45 / 32), Interval(3 / 2), Interval(8 / 5),
+                                        Interval(5 / 3), Interval(9 / 5), Interval(15 / 8)])
 
 
 def sharpen(value: float,
-            amount: Interval = EqualTemperament.MINOR_SECOND,
+            amount: Interval = EqualTemperament12.MINOR_SECOND,
             count: int = 1):
     return value * Interval(amount.value ** count).value
 
 
 def flatten(value: float,
-            amount: Interval = EqualTemperament.MINOR_SECOND,
+            amount: Interval = EqualTemperament12.MINOR_SECOND,
             count: int = 1):
     return value * Interval(amount.value ** count).inverse
+
+
+if __name__ == '__main__':
+    x = Temperament([Interval(1) for i in range(12)])
+    print(x.intervals_12)

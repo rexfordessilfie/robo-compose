@@ -1,6 +1,6 @@
 from typing import List
 from enum import Enum
-from composer.intervals import EqualTemperament, Interval, Temperament
+from composer.intervals import EqualTemperament12, Interval, Temperament
 
 
 class ScaleMode(Enum):
@@ -10,7 +10,7 @@ class ScaleMode(Enum):
 
 
 class Scale:
-    def __init__(self, temperament: Temperament = EqualTemperament):
+    def __init__(self, temperament: Temperament = EqualTemperament12):
         self.temperament = temperament
 
     @property
@@ -21,17 +21,19 @@ class Scale:
 class MajorScale(Scale):
     @property
     def intervals(self):
-        return [self.temperament.UNISON, self.temperament.MAJOR_SECOND, self.temperament.MAJOR_THIRD,
-                self.temperament.PERFECT_FOURTH, self.temperament.PERFECT_FIFTH, self.temperament.MAJOR_SIXTH,
-                self.temperament.MAJOR_SEVENTH, self.temperament.OCTAVE]
+        return [self.temperament.intervals_12.UNISON, self.temperament.intervals_12.MAJOR_SECOND,
+                self.temperament.intervals_12.MAJOR_THIRD, self.temperament.intervals_12.PERFECT_FOURTH,
+                self.temperament.intervals_12.PERFECT_FIFTH, self.temperament.intervals_12.MAJOR_SIXTH,
+                self.temperament.intervals_12.MAJOR_SEVENTH, self.temperament.intervals_12.OCTAVE]
 
 
 class MinorScale(Scale):
     @property
     def intervals(self):
-        return [self.temperament.UNISON, self.temperament.MAJOR_SECOND, self.temperament.MINOR_THIRD,
-                self.temperament.PERFECT_FOURTH, self.temperament.PERFECT_FIFTH, self.temperament.MINOR_SIXTH,
-                self.temperament.MAJOR_SEVENTH, self.temperament.OCTAVE]
+        return [self.temperament.intervals_12.UNISON, self.temperament.intervals_12.MAJOR_SECOND,
+                self.temperament.intervals_12.MINOR_THIRD, self.temperament.intervals_12.PERFECT_FOURTH,
+                self.temperament.intervals_12.PERFECT_FIFTH, self.temperament.intervals_12.MINOR_SIXTH,
+                self.temperament.intervals_12.MAJOR_SEVENTH, self.temperament.intervals_12.OCTAVE]
 
 
 class ChromaticScale(Scale):
@@ -82,7 +84,7 @@ class ScaleFactory:
     """Exposes functions to get a scale builder or to build a scale and return it."""
 
     @classmethod
-    def get_scale_builder(cls, mode: ScaleMode, temperament: Temperament = EqualTemperament) -> ScaleBuilder:
+    def get_scale_builder(cls, mode: ScaleMode, temperament: Temperament = EqualTemperament12) -> ScaleBuilder:
         if mode == ScaleMode.MAJOR:
             return ScaleBuilder(interval_list=MajorScale(temperament).intervals,
                                 intervals_relative_to_start=True)
@@ -96,7 +98,7 @@ class ScaleFactory:
                                 intervals_relative_to_start=True)
 
     @classmethod
-    def get_scale(cls, start_frequency, mode: ScaleMode, temperament: Temperament = EqualTemperament) -> List[float]:
+    def get_scale(cls, start_frequency, mode: ScaleMode, temperament: Temperament = EqualTemperament12) -> List[float]:
         scale_builder = cls.get_scale_builder(mode, temperament)
         scale = scale_builder.build(start_frequency)
         return scale

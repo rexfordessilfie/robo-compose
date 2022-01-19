@@ -4,7 +4,7 @@ import random
 from dataclasses import dataclass
 from typing import Union, Generator, Tuple, List
 
-from composer.intervals import EqualTemperament
+from composer.intervals import EqualTemperament12
 from composer.scales import ScaleFactory, ScaleMode
 from composer.utils import next_wrap, prev_wrap, random_element
 
@@ -366,12 +366,12 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
 
     # how many times and in what direction do we need to reduce/increase octave
     # to normalize to the same octave range
-    normalization_scale = math.floor(math.log(reference_pitch.frequency, EqualTemperament.OCTAVE.value) -
-                                     math.log(frequency, EqualTemperament.OCTAVE.value))
+    normalization_scale = math.floor(math.log(reference_pitch.frequency, EqualTemperament12.OCTAVE.value) -
+                                     math.log(frequency, EqualTemperament12.OCTAVE.value))
 
     # normalize the frequency by multiplying with the normalization interval
     # i.e. the number of octaves we need to normalize the frequency
-    normalization_interval = EqualTemperament.OCTAVE.value ** normalization_scale
+    normalization_interval = EqualTemperament12.OCTAVE.value ** normalization_scale
     normalized_frequency = frequency * normalization_interval
 
     normalized_interval = interval_between_frequencies(reference_pitch.frequency,
@@ -380,7 +380,7 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
     # TODO: maybe get more specific about this rounding? What tolerance are we willing to accept when there are extra
     #   decimals?
     num_semitones_from_reference = round(
-        math.log(normalized_interval, EqualTemperament.MINOR_SECOND.value)
+        math.log(normalized_interval, EqualTemperament12.MINOR_SECOND.value)
     )
 
     final_pitch_idx = (reference_pitch_idx +
@@ -408,9 +408,9 @@ def frequency_from_pitch_info(pitch_info: PitchInfo):
 
     octave_difference = pitch_info.register - matching_pitch.register
 
-    base_frequency = reference_pitch.frequency * (EqualTemperament.MINOR_SECOND.value ** num_semitones_from_reference)
+    base_frequency = reference_pitch.frequency * (EqualTemperament12.MINOR_SECOND.value ** num_semitones_from_reference)
 
-    final_frequency = base_frequency * (EqualTemperament.OCTAVE.value ** octave_difference)
+    final_frequency = base_frequency * (EqualTemperament12.OCTAVE.value ** octave_difference)
     return final_frequency
 
 
@@ -470,7 +470,7 @@ class Pitch(PitchInfo):
 
     def matches(self,
                 other: 'Pitch',
-                tolerance=EqualTemperament.MINOR_SECOND.value / 4
+                tolerance=EqualTemperament12.MINOR_SECOND.value / 4
                 ) -> bool:
         """
         Two pitches are a match if one pitch's frequency can be expressed
