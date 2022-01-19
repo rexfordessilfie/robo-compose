@@ -1,11 +1,11 @@
 # robo-compose
 Robo-compose is a fun Python project for creating random melodies for compositional inspiration. 
-Robo-compose also contains some utility classes and functions that model musical concepts in an object-oriented style, 
+Robo-compose also contains some utility classes and functions that model musical concepts, 
 and allow for musical programming. 
 
 This project was inspired by a desire to create musical ideas, and to practice design patterns and OOP in Python. 
-So far it has evolved into more, and I hope to continue to implement more features and ideas as they come.
-First, some definitions of classes defined and used within the project.
+I hope to continue to implement more features or ideas as they come.
+Here are some definitions of classes defined and used within the project, and then how they are used.
 
 # Definitions
 The `composer` package contains the following classes:
