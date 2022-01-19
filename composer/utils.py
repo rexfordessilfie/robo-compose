@@ -1,5 +1,6 @@
 from typing import List, Any
 import random
+import time
 
 
 def next_wrap(current: Any, elements: List[Any], overlap_size: int = 0):
@@ -37,6 +38,13 @@ def random_element(elements: List[Any]):
     TODO: add weighted profile to be able to skew the result
     """
     return elements[random.randint(0, len(elements) - 1)]
+
+
+def filename_timestamp():
+    """
+    Gets the current timestamp as can be appended to a filename
+    """
+    return time.strftime("-%Y_%m_%d-%H_%M_%S")
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ from composer.intervals import EqualTemperament12, sharpen, flatten
 from composer.pitches import Pitch, KeySignature
 from composer.notes import Note, TimeSignature, NoteValue
 from composer.scales import ScaleMode
+from composer.utils import filename_timestamp
 
 
 def rest(duration=0.005):
@@ -13,14 +14,17 @@ def rest(duration=0.005):
 
 def slider_song(bars=4):
     chord = ChordFactory.get_chord(440, 'MM7M6')
+    progression = [chord,
+                   list(map(sharpen, chord)),
+                   list(map(flatten, chord)),
+                   list(map(flatten, chord)),
+                   list(map(flatten, chord)),
+                   list(map(flatten, chord))]
+
+    Tone.write_progression('slider_song.wav', progression)
+
     for _ in range(bars):
-        Tone.play_progression(
-            [chord,
-             map(sharpen, chord),
-             map(flatten, chord),
-             map(flatten, chord),
-             map(flatten, chord),
-             map(flatten, chord)])
+        Tone.play_progression(progression)
         rest(0.005)
 
 
@@ -29,12 +33,15 @@ def summer_fun_song(bars=4):
     chord2 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FOURTH, ChordQuality.MAJOR)
     chord3 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FIFTH, ChordQuality.MAJOR)
 
+    progression = [chord1,
+                   chord1,
+                   chord2,
+                   chord3]
+
+    Tone.write_progression('summer_fun_song.wav', progression)
+
     for _ in range(bars):
-        Tone.play_progression(
-            [chord1,
-             chord1,
-             chord2,
-             chord3])
+        Tone.play_progression(progression)
         rest(0.005)
 
 
@@ -42,11 +49,13 @@ def random_song(bars=4,
                 mode=ScaleMode.MAJOR,
                 root_frequency=440,
                 num_notes=8):
-
     key_signature = KeySignature(pitch=Pitch(root_frequency), mode=mode)
     random_notes = [
         Note.random(key_signature=key_signature)
         for _ in range(num_notes)]
+
+    timestamp = filename_timestamp()
+    Tone.write_melody(f"random_song{timestamp}.wav", random_notes)
 
     for _ in range(bars):
         Tone.play_melody(random_notes)
@@ -76,13 +85,11 @@ def random_piece(bars=4,
         Note.random(key_signature=key_signature, time_signature=time_signature, bpm=bpm)
         for _ in range(num_notes)]
 
-    print(random_notes)
-
     for _ in range(bars):
         Tone.play_melody(random_notes)
         rest(0.005)
 
 
 if __name__ == '__main__':
-    summer_fun_song()
+    random_song()
     pass
