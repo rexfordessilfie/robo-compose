@@ -40,23 +40,23 @@ class Interval:
 class Temperament:
     def __init__(self, intervals: List[Interval], temperament_12_indexes: Tuple[int] = None):
         self.intervals = intervals
-        self.intervals_12_indexes = list(range(12)) if len(intervals) == 12 else temperament_12_indexes
+        self._intervals_12_indexes = list(range(12)) if len(intervals) == 12 else temperament_12_indexes
         self._aliases = {}
-        self._intervals_12 = None
+        self._temperament_12 = None
 
     def aliased_interval(self, name: str) -> Interval:
         return self._aliases.get(name, None)
 
     @property
     def temperament_12(self):
-        if len(self.intervals) < 12 or not self.intervals_12_indexes:
+        if len(self.intervals) < 12 or not self._intervals_12_indexes:
             raise AttributeError(f"{self.__class__.__name__} does not support twelve tone intervals")
 
-        if not self._intervals_12:
-            self._intervals_12 = TwelveToneTemperament([self.intervals[i] for i in self.intervals_12_indexes]) \
-                if self.intervals_12_indexes else None
+        if not self._temperament_12:
+            self._temperament_12 = TwelveToneTemperament([self.intervals[i] for i in self._intervals_12_indexes]) \
+                if self._intervals_12_indexes else None
 
-        return self._intervals_12
+        return self._temperament_12
 
 
 class TwelveToneTemperament(Temperament):
