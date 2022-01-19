@@ -24,49 +24,49 @@ class Chord(Scale, ABC):
 class MajorChord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.MAJOR_THIRD,
-                self.temperament.intervals_12.PERFECT_FIFTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.MAJOR_THIRD,
+                self.temperament.temperament_12.PERFECT_FIFTH]
 
 
 class MinorChord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.MINOR_THIRD,
-                self.temperament.intervals_12.PERFECT_FIFTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.MINOR_THIRD,
+                self.temperament.temperament_12.PERFECT_FIFTH]
 
 
 class Sus2Chord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.MAJOR_SECOND,
-                self.temperament.intervals_12.PERFECT_FIFTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.MAJOR_SECOND,
+                self.temperament.temperament_12.PERFECT_FIFTH]
 
 
 class Sus4Chord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.PERFECT_FOURTH,
-                self.temperament.intervals_12.PERFECT_FIFTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.PERFECT_FOURTH,
+                self.temperament.temperament_12.PERFECT_FIFTH]
 
 
 class DiminishedChord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.MINOR_THIRD,
-                self.temperament.intervals_12.DIMINISHED_FIFTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.MINOR_THIRD,
+                self.temperament.temperament_12.DIMINISHED_FIFTH]
 
 
 class AugmentedChord(Chord):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON,
-                self.temperament.intervals_12.MAJOR_THIRD,
-                self.temperament.intervals_12.MINOR_SIXTH]
+        return [self.temperament.temperament_12.UNISON,
+                self.temperament.temperament_12.MAJOR_THIRD,
+                self.temperament.temperament_12.MINOR_SIXTH]
 
 
 class ChordFactory:

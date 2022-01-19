@@ -21,19 +21,19 @@ class Scale:
 class MajorScale(Scale):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON, self.temperament.intervals_12.MAJOR_SECOND,
-                self.temperament.intervals_12.MAJOR_THIRD, self.temperament.intervals_12.PERFECT_FOURTH,
-                self.temperament.intervals_12.PERFECT_FIFTH, self.temperament.intervals_12.MAJOR_SIXTH,
-                self.temperament.intervals_12.MAJOR_SEVENTH, self.temperament.intervals_12.OCTAVE]
+        return [self.temperament.temperament_12.UNISON, self.temperament.temperament_12.MAJOR_SECOND,
+                self.temperament.temperament_12.MAJOR_THIRD, self.temperament.temperament_12.PERFECT_FOURTH,
+                self.temperament.temperament_12.PERFECT_FIFTH, self.temperament.temperament_12.MAJOR_SIXTH,
+                self.temperament.temperament_12.MAJOR_SEVENTH, self.temperament.temperament_12.OCTAVE]
 
 
 class MinorScale(Scale):
     @property
     def intervals(self):
-        return [self.temperament.intervals_12.UNISON, self.temperament.intervals_12.MAJOR_SECOND,
-                self.temperament.intervals_12.MINOR_THIRD, self.temperament.intervals_12.PERFECT_FOURTH,
-                self.temperament.intervals_12.PERFECT_FIFTH, self.temperament.intervals_12.MINOR_SIXTH,
-                self.temperament.intervals_12.MAJOR_SEVENTH, self.temperament.intervals_12.OCTAVE]
+        return [self.temperament.temperament_12.UNISON, self.temperament.temperament_12.MAJOR_SECOND,
+                self.temperament.temperament_12.MINOR_THIRD, self.temperament.temperament_12.PERFECT_FOURTH,
+                self.temperament.temperament_12.PERFECT_FIFTH, self.temperament.temperament_12.MINOR_SIXTH,
+                self.temperament.temperament_12.MAJOR_SEVENTH, self.temperament.temperament_12.OCTAVE]
 
 
 class ChromaticScale(Scale):

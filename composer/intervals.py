@@ -38,9 +38,9 @@ class Interval:
 # Interval Definitions
 
 class Temperament:
-    def __init__(self, intervals: List[Interval], intervals_12_indexes: Tuple[int] = None):
+    def __init__(self, intervals: List[Interval], temperament_12_indexes: Tuple[int] = None):
         self.intervals = intervals
-        self.intervals_12_indexes = list(range(12)) if len(intervals) == 12 else intervals_12_indexes
+        self.intervals_12_indexes = list(range(12)) if len(intervals) == 12 else temperament_12_indexes
         self._aliases = {}
         self._intervals_12 = None
 
@@ -48,7 +48,7 @@ class Temperament:
         return self._aliases.get(name, None)
 
     @property
-    def intervals_12(self):
+    def temperament_12(self):
         if len(self.intervals) < 12 or not self.intervals_12_indexes:
             raise AttributeError(f"{self.__class__.__name__} does not support twelve tone intervals")
 
@@ -61,7 +61,7 @@ class Temperament:
 
 class TwelveToneTemperament(Temperament):
     def __init__(self, intervals: List[Interval]):
-        super().__init__(intervals=intervals, intervals_12_indexes=tuple(range(12)))
+        super().__init__(intervals=intervals, temperament_12_indexes=tuple(range(12)))
 
         intervals_size = len(intervals)
         if intervals_size != 12:
@@ -108,7 +108,7 @@ class TwelveToneTemperament(Temperament):
         }
 
     @property
-    def intervals_12(self):
+    def temperament_12(self):
         return self
 
 
@@ -134,4 +134,4 @@ def flatten(value: float,
 
 if __name__ == '__main__':
     x = Temperament([Interval(1) for i in range(12)])
-    print(x.intervals_12)
+    print(x.temperament_12)
