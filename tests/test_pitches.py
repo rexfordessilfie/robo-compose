@@ -61,7 +61,8 @@ def test_pitch_info_to_pitch():
 
 
 def test_complete_pitch_info():
-    pitch_info_complete = PitchInfo(frequency=440, pitch_class=PitchClass.A, accidental=Accidental.NATURAL, register=4)
+    pitch_info_complete = PitchInfo(frequency=440, pitch_class=PitchClass.A, accidental=Accidental.NATURAL, register=4,
+                                    midi_number=69)
     assert is_pitch_complete(pitch_info_complete)
 
     pitch_info_missing_frequency = PitchInfo(pitch_class=PitchClass.A, accidental=Accidental.NATURAL, register=4)
@@ -155,15 +156,15 @@ def test_contiguous_chromatic_pitches_info_backward():
 def test_pitch_info_from_pitch_string():
     a_flat_5 = pitch_info_from_pitch_string('Ab5')
 
-    assert math.isclose(830, a_flat_5.frequency, abs_tol=1)
     assert a_flat_5.pitch_class == PitchClass.A
     assert a_flat_5.accidental == Accidental.FLAT
+    assert a_flat_5.register == 5
 
     a_sharp_5 = pitch_info_from_pitch_string('A#5')
 
-    assert math.isclose(932, a_sharp_5.frequency, abs_tol=1)
     assert a_sharp_5.pitch_class == PitchClass.A
     assert a_sharp_5.accidental == Accidental.SHARP
+    assert a_sharp_5.register == 5
 
 
 def test_pitch_info_from_frequency():

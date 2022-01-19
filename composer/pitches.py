@@ -108,12 +108,13 @@ class PitchClass:
 
 @dataclass
 class PitchInfo:
-    frequency: int = None
+    frequency: float = None
     pitch_class: str = None
     accidental: str = None
     register: int = None
     enharmonic_pitch_class: str = None
     enharmonic_accidental: str = None
+    midi_number: float = None
 
     def next(self):
         """
@@ -205,7 +206,8 @@ CHROMATIC_PITCHES_INFO = [
     PitchInfo(pitch_class=PitchClass.A,
               accidental=Accidental.NATURAL,
               register=4,
-              frequency=440),
+              frequency=440,
+              midi_number=69),
 
     # Pitch<A,sharp,4>
     PitchInfo(pitch_class=PitchClass.A,
@@ -285,7 +287,7 @@ def is_pitch_complete(p: PitchInfo):
     """
     Check if a pitch/pitch info is complete, i.e. has a pitch class, accidental, frequency and register.
     """
-    return p.pitch_class and p.accidental and p.frequency and p.register is not None
+    return p.pitch_class and p.accidental and p.frequency and p.register is not None and p.midi_number is not None
 
 
 def complete_pitch_info_generator(pitches_info: List[PitchInfo] = None) -> Generator[Tuple[PitchInfo, int], None, None]:
@@ -354,7 +356,6 @@ def pitch_info_from_pitch_string(pitch_str: str) -> PitchInfo:
     final_pitch_info = copy.deepcopy(matching_chromatic_pitch_info)
 
     final_pitch_info.register = register
-    final_pitch_info.frequency = frequency_from_pitch_info(final_pitch_info)
 
     if is_enharmonic_match(pitch_info, matching_chromatic_pitch_info):
         final_pitch_info.swap_enharmonic()
@@ -394,7 +395,6 @@ def pitch_info_from_frequency(frequency: float) -> PitchInfo:
     final_pitch = copy.deepcopy(found_pitch)
 
     final_pitch.register = final_pitch.register + (-normalization_scale)
-    final_pitch.frequency = frequency
 
     return final_pitch
 
@@ -418,10 +418,29 @@ def frequency_from_pitch_info(pitch_info: PitchInfo):
     return final_frequency
 
 
+def midi_number_from_frequency(frequency: float):
+    """
+    Get midi-number from frequency (12-tone equal temperament).
+    Source: https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+    """
+    reference_pitch, _ = next(complete_pitch_info_generator())
+    return reference_pitch.midi_number + (12 * math.log(frequency / reference_pitch.frequency, 2))
+
+
+def frequency_from_midi_number(midi_number: float):
+    """
+    Get frequency from midi-number (12-tone equal temperament).
+    Source: https://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+    """
+    reference_pitch, _ = next(complete_pitch_info_generator())
+    return reference_pitch.frequency * 2 ** ((midi_number - reference_pitch.midi_number) / 12)
+
+
 class Pitch(PitchInfo):
     def __init__(
             self,
             identifier: Union[str, int, float] = None,
+            midi_number: float = None,
             pitch_class=None,
             accidental=Accidental.NATURAL,
             register=4,
@@ -440,7 +459,8 @@ class Pitch(PitchInfo):
                                     accidental=accidental,
                                     register=register,
                                     enharmonic_pitch_class=enharmonic_pitch_class,
-                                    enharmonic_accidental=enharmonic_accidental)
+                                    enharmonic_accidental=enharmonic_accidental,
+                                    midi_number=midi_number)
 
         if is_pitch_complete(self):
             return
@@ -450,7 +470,11 @@ class Pitch(PitchInfo):
             self.frequency = frequency
         elif pitch_string is not None:
             pitch_info = pitch_info_from_pitch_string(pitch_string)
-            self.frequency = pitch_info.frequency
+            self.frequency = frequency_from_pitch_info(pitch_info)
+        elif midi_number is not None:
+            self.midi_number = midi_number
+            self.frequency = frequency_from_midi_number(midi_number)
+            pitch_info = pitch_info_from_frequency(self.frequency)
         else:
             pitch_info = PitchInfo(pitch_class=self.pitch_class,
                                    accidental=self.accidental,
@@ -463,8 +487,12 @@ class Pitch(PitchInfo):
         self.enharmonic_pitch_class = pitch_info.enharmonic_pitch_class
         self.enharmonic_accidental = pitch_info.enharmonic_accidental
 
+        self.midi_number = self.midi_number if self.midi_number is not None \
+            else midi_number_from_frequency(self.frequency)
+
     def __repr__(self):
-        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}>"
+        return f"{self.__class__.__name__}<{self.frequency},{self.pitch_class},{self.accidental},{self.register}," \
+               f"{self.midi_number}>"
 
     def next(self):
         return super(Pitch, self).next().to_pitch()
