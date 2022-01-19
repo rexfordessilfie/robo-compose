@@ -1,27 +1,27 @@
 # robo-compose
-Robo-compose is a fun Python project for creating random melodies for compositional inspiration. 
-Robo-compose also contains some utility classes and functions that model musical concepts, 
-and allow for musical programming. 
+Robo-compose is a fun Python project for creating random melodies for compositional inspiration.
+Robo-compose also contains some utility classes and functions that model musical concepts,
+and allow for musical programming.
 
-This project was inspired by a desire to create musical ideas, and to practice design patterns and OOP in Python. 
+This project was inspired by a desire to create musical ideas, and to practice design patterns and OOP in Python.
 I hope to continue to implement more features or ideas as they come.
 Here are some definitions of classes defined and used within the project, and then how they are used.
 
 # Definitions
 The `composer` package contains the following classes:
-* `Pitch`: This is a sound identified by a frequency e.g. `440Hz`, `466Hz`, or 
-by a note name - referred to as "pitch string" - e.g. `'A4'`, `'A4#'`.
+* `Pitch`: This is a sound identified by a frequency e.g. `440Hz`, `466Hz`, or
+  by a note name - referred to as "pitch string" - e.g. `'A4'`, `'A4#'`.
 * `Note`: This is a sound identified by a `Pitch` and a `Duration`.
-* `Duration`: This is a length of time identified explicitly by time in seconds, 
-or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
-* `NoteValue`: This is a Western music note value identified by a number (or fraction). 
-Note values include, whole note (1), half note (1/2), quarter note (1/4) etc.
+* `Duration`: This is a length of time identified explicitly by time in seconds,
+  or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
+* `NoteValue`: This is a Western music note value identified by a number (or fraction).
+  Note values include, whole note (1), half note (1/2), quarter note (1/4) etc.
 * `TimeSignature`: This is a Western music time signature identified by a combination of
-number of beats and the note value of a beat.
+  number of beats and the note value of a beat.
 * `Interval`: A number denoting the relative distance between two frequencies. Common intervals in Western
-Music include, the perfect fifth (3/2), octave (2/1) and more.
+  Music include, the perfect fifth (3/2), octave (2/1) and more.
 * `Temperament`: This a Western Music tuning system identified by a list of intervals.
-Examples include equal temperament, and just-intonation.
+  Examples include equal temperament, and just-intonation.
 * `Scale` (or `Chord`): This is an arbitrary collection of intervals that identify a given scale (or chord).
 
 
@@ -76,7 +76,7 @@ duration_3_seconds = Duration(3)
 
 # Create a Duration from bpm, time_signature and more
 time_signature_4_4 = TimeSignature(4, NoteValue.QUARTER)
-duration_for_quarter_note = Duration(note_value=NoteValue.QUARTER, 
+duration_for_quarter_note = Duration(note_value=NoteValue.QUARTER,
                                      time_signature=time_signature_4_4,
                                      bpm=60)
 
@@ -123,7 +123,7 @@ from composer import Note
 random_note = Note.random()
 ```
 
-### Play Audio w/ `Tone`
+### Play/Save Audio w/ `Tone`
 To play notes, you can use the `Tone` class defined in `composeer.tone` (`tone.py`).
 This class is a simple one that provides functions for playing a single note, melody, or chord.
 
@@ -145,15 +145,20 @@ Tone.play_melody(melody)
 # Play a Chord (C5# Major 7 chord)
 chord = ChordFactory.get_chord(Pitch("C5#").frequency, "MM7")
 Tone.play_chord(chord)
+
+# Save Melody as WAV
+Tone.write_wav_melody("my_melody.wav", melody)
+
+# Save Melody as MIDI
+Tone.write_midi_melody("my_melody.mid", melody)
 ```
 
 
 # Future Work
 I plan on working on some more features to add to this project to make it more useful for composition and musical programming. Some ideas include:
-1. Conversion of generated compositions to wav files, and to MIDI for use in MuseScore or DAWs
-2. Generating random chord progressions
-3. Heuristic/probabilistic-based random melodies
-4. Improve modeling for songs/pieces for multi-part composition
-5. Harmonic analysis!
+1. Generating random chord progressions
+2. Heuristic/probabilistic-based random melodies
+3. Improve modeling for songs/pieces for multi-part composition
+4. Harmonic analysis!
 
 Ideas and feature requests are welcome!
