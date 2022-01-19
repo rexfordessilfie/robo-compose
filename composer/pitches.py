@@ -131,7 +131,8 @@ class PitchInfo:
         if pitch_info.accidental == Accidental.NATURAL:
             pitch_info.pitch_class = PitchClass.next(pitch_info.pitch_class)
 
-        # TODO: update register as well
+        if pitch_info.pitch_class == PitchClass.C and pitch_info.accidental == Accidental.NATURAL:
+            pitch_info.register = pitch_info.register + 1
 
         return pitch_info
 
@@ -150,6 +151,9 @@ class PitchInfo:
 
         if pitch_info.accidental == Accidental.NATURAL:
             pitch_info.pitch_class = PitchClass.prev(pitch_info.pitch_class)
+
+        if pitch_info.pitch_class == PitchClass.B and pitch_info.accidental == Accidental.NATURAL:
+            pitch_info.register = pitch_info.register - 1
 
         return pitch_info
 
@@ -514,4 +518,4 @@ class KeySignature:
 
 if __name__ == '__main__':
     print(Pitch('Gb8'))
-    print(Pitch(pitch_class=PitchClass.B, accidental=Accidental.FLAT, register=4).prev())
+    print(Pitch(pitch_class=PitchClass.C, accidental=Accidental.NATURAL, register=4).prev())
