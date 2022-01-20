@@ -1,7 +1,7 @@
 from typing import List, Union
 from notes import Note, Duration, TimeSignature, NoteValue
 from pitches import Pitch
-from utils import filename_timestamp
+from utils import filename_timestamp, composer_root_directory
 
 from synthesizer import Player, Synthesizer, Waveform, Writer
 import numpy as np
@@ -39,12 +39,12 @@ def ensure_out_directory_exists(directory: str):
 
 def wav_out_file_path(filename: str):
     ensure_out_directory_exists(WAV_OUT_DIR)
-    return f"../{WAV_OUT_DIR}/{filename}"
+    return f"{composer_root_directory}/{WAV_OUT_DIR}/{filename}"
 
 
 def midi_out_file_path(filename: str):
     ensure_out_directory_exists(MIDI_OUT_DIR)
-    return f"../{MIDI_OUT_DIR}/{filename}"
+    return f"{composer_root_directory}/{MIDI_OUT_DIR}/{filename}"
 
 
 class Tone:
@@ -97,14 +97,16 @@ class Tone:
     @classmethod
     def write_wav_melody(cls, filename: str, notes: List[Union[float, Pitch, Note]] = None, duration: float = 1):
         file_path = wav_out_file_path(filename)
-        melody_wav = np.concatenate([cls.wave_from_note(note, duration) for note in notes])
+        melody_wav = np.concatenate(
+            [cls.wave_from_note(note, duration) for note in notes])
         cls.writer.write_wave(file_path, melody_wav)
 
     @classmethod
     def write_wav_progression(cls, filename: str, chords: List[List[Union[float, Pitch, Note]]] = None,
                               duration: float = 1):
         file_path = wav_out_file_path(filename)
-        progression_wav = np.concatenate([cls.wave_from_chord(chord, duration) for chord in chords])
+        progression_wav = np.concatenate(
+            [cls.wave_from_chord(chord, duration) for chord in chords])
         cls.writer.write_wave(file_path, progression_wav)
 
     @classmethod
@@ -125,7 +127,8 @@ class Tone:
 
             if note.duration.bpm:
                 # TODO: debug whether this has any effect on output midi file
-                midi.addTempo(track=melody_track, time=time_marker, tempo=note.duration.bpm)
+                midi.addTempo(track=melody_track, time=time_marker,
+                              tempo=note.duration.bpm)
 
             midi.addNote(track=melody_track,
                          time=time_marker,
