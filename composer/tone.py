@@ -33,8 +33,8 @@ def extract_duration(o: Union[float, Duration, Note], default: float = None):
 
 
 def ensure_out_directory_exists(directory: str):
-    if not os.path.exists(f"../{directory}"):
-        os.makedirs(f"../{directory}")
+    if not os.path.exists(f"{composer_root_directory}/{directory}"):
+        os.makedirs(f"{composer_root_directory}/{directory}")
 
 
 def wav_out_file_path(filename: str):
