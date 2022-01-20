@@ -52,7 +52,7 @@ def random_song(bars=2,
 
     timestamp = filename_timestamp()
     Tone.write_wav_melody(f"random_song{timestamp}.wav", random_notes)
-    Tone.write_wav_melody(f"random_song{timestamp}.mid", random_notes)
+    Tone.write_midi_melody(f"random_song{timestamp}.mid", random_notes)
 
     for _ in range(bars):
         Tone.play_melody(random_notes)
@@ -84,7 +84,7 @@ def random_piece(bars=2,
 
     timestamp = filename_timestamp()
     Tone.write_wav_melody(f"random_piece{timestamp}.wav", random_notes)
-    Tone.write_wav_melody(f"random_piece{timestamp}.mid", random_notes)
+    Tone.write_midi_melody(f"random_piece{timestamp}.mid", random_notes)
 
     for _ in range(bars):
         Tone.play_melody(random_notes)
