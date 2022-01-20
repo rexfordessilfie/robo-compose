@@ -24,38 +24,43 @@ The `composer` package contains the following classes:
   Examples include equal temperament, and just-intonation.
 * `Scale` (or `Chord`): This is an arbitrary collection of intervals that identify a given scale (or chord).
 
-# Installation
-To try out this project, you can:
-1. Clone the repository and then change into the directory:
-```shell
-$ git clone https://github.com/RexfordEssilfie/robo-compose.git
-$ cd robo-compose 
-```
+# Try it Out!
+Follow these steps to try out this project:
+
+1. Clone the repository and then change into the project directory:
+  ```shell
+  $ git clone https://github.com/RexfordEssilfie/robo-compose.git
+  $ cd robo-compose 
+  ```
+
 2. Install requirements using:
-```shell
-$ pip install -r requirements.txt
-```
-NB: You will need to install Python 3.9.1 first from [here](https://www.python.org/downloads/).
+  ```shell
+  $ pip install -r requirements.txt
+  ```
+  NB: You will need to install Python 3.9.1 first from [here](https://www.python.org/downloads/).
+
 3. Open `composer/songs.py` file, where you will find functions representing songs,
 such as, `random_song()`, `summer_fun_song()` and more.
-4. Add a call to the function in the main method of the file as follows:
-```python
-# composer/songs.py
 
-def random_song():
-  ...
+4. Add a call to the song's function in the main method of the file as follows:
+  ```python
+  # composer/songs.py
+
+  def random_song():
+    ...
 
 
-if __name__ == "__main__":
-    random_song() # Call the function here!
-    pass
-```
-The `random_song` function will play a randomly generated song, and write midi and wav files to the `out` directory, in case you want
-to come back to them for later or open in MuseScore or Logic Pro X for further exploration and development!
-1. Run the `composer/songs.py` file to play the song, using the following command:
-```shell
-$ python composer/songs.py
-```
+  if __name__ == "__main__":
+      random_song() # Call the function here!
+      pass
+  ```
+  The `random_song` function will play a randomly generated song, and write midi and wav files to the `out` directory, in case you want
+  to come back to them for later or open in MuseScore or Logic Pro X for further exploration and development!
+
+5. Run the `composer/songs.py` file to play the song, using the following command:
+  ```shell
+  $ python composer/songs.py
+  ```
 
 
 
