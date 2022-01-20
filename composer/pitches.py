@@ -4,9 +4,9 @@ import random
 from dataclasses import dataclass
 from typing import Union, Generator, Tuple, List
 
-from composer.intervals import EqualTemperament12
-from composer.scales import ScaleFactory, ScaleMode
-from composer.utils import next_wrap, prev_wrap, random_element
+from intervals import EqualTemperament12
+from scales import ScaleFactory, ScaleMode
+from utils import next_wrap, prev_wrap, random_element
 
 
 # TODO: add 'temperament' parameter to pass tuning as argument everywhere EqualTemperament is used

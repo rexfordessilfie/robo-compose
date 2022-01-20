@@ -1,18 +1,18 @@
 import time
-from composer.tone import Tone
-from composer.chords import ChordFactory, ChordQuality
-from composer.intervals import EqualTemperament12, sharpen, flatten
-from composer.pitches import Pitch, KeySignature
-from composer.notes import Note, TimeSignature, NoteValue
-from composer.scales import ScaleMode
-from composer.utils import filename_timestamp
+from tone import Tone
+from chords import ChordFactory, ChordQuality
+from intervals import EqualTemperament12, sharpen, flatten
+from pitches import Pitch, KeySignature
+from notes import Note, TimeSignature, NoteValue
+from scales import ScaleMode
+from utils import filename_timestamp
 
 
 def rest(duration=0.005):
     time.sleep(duration)
 
 
-def slider_song(bars=4):
+def slider_song(bars=2):
     chord = ChordFactory.get_chord(440, 'MM7M6')
     progression = [chord,
                    list(map(sharpen, chord)),
@@ -26,7 +26,7 @@ def slider_song(bars=4):
         rest(0.005)
 
 
-def summer_fun_song(bars=4):
+def summer_fun_song(bars=2):
     chord1 = ChordFactory.get_chord(440, ChordQuality.MAJOR)
     chord2 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FOURTH, ChordQuality.MAJOR)
     chord3 = ChordFactory.get_chord(440 * EqualTemperament12.PERFECT_FIFTH, ChordQuality.MAJOR)
@@ -41,7 +41,7 @@ def summer_fun_song(bars=4):
         rest(0.005)
 
 
-def random_song(bars=4,
+def random_song(bars=2,
                 mode=ScaleMode.MAJOR,
                 root_frequency=440,
                 num_notes=8):
@@ -59,7 +59,7 @@ def random_song(bars=4,
         rest(0.005)
 
 
-def scale_song(bars=1,
+def scale_song(bars=2,
                mode=ScaleMode.MAJOR,
                root_frequency=440):
     scale = KeySignature(pitch=Pitch(root_frequency), mode=mode).scale
@@ -69,7 +69,7 @@ def scale_song(bars=1,
         rest(0.005)
 
 
-def random_piece(bars=4,
+def random_piece(bars=2,
                  mode=ScaleMode.MAJOR,
                  root_frequency=440,
                  num_notes=12,

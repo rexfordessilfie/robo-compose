@@ -1,7 +1,7 @@
 from typing import List, Union
-from composer.notes import Note, Duration, TimeSignature, NoteValue
-from composer.pitches import Pitch
-from composer.utils import filename_timestamp
+from notes import Note, Duration, TimeSignature, NoteValue
+from pitches import Pitch
+from utils import filename_timestamp
 
 from synthesizer import Player, Synthesizer, Waveform, Writer
 import numpy as np

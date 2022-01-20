@@ -1,6 +1,6 @@
 from typing import List
 from enum import Enum
-from composer.intervals import EqualTemperament12, Interval, Temperament
+from intervals import EqualTemperament12, Interval, Temperament
 
 
 class ScaleMode(Enum):

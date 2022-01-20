@@ -1,7 +1,7 @@
 from abc import ABC
 
-from composer.intervals import Temperament, EqualTemperament12
-from composer.scales import ScaleBuilder, Scale
+from intervals import Temperament, EqualTemperament12
+from scales import ScaleBuilder, Scale
 import re
 
 
