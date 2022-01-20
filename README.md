@@ -10,7 +10,7 @@ Here are some definitions of classes defined and used within the project, and th
 # Definitions
 The `composer` package contains the following classes:
 * `Pitch`: This is a sound identified by a frequency e.g. `440Hz`, `466Hz`, or
-  by a note name - referred to as "pitch string" - e.g. `'A4'`, `'A4#'`.
+  by a note name - referred to as "pitch string" - e.g. `"A4"`, `"A4#"`.
 * `Note`: This is a sound identified by a `Pitch` and a `Duration`.
 * `Duration`: This is a length of time identified explicitly by time in seconds,
   or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
@@ -72,15 +72,35 @@ A `Pitch` may be instantiated as follows:
 ```python
 from composer import Pitch, PitchClass, Accidental
 
-# Instantiation
+# Instantiation from Frequency
 a4 = Pitch(440)
 
+# Instantiation from Pitch String
 g4_flat = Pitch("G4b")
 
+# Instantiation from MIDI Number
+c5 = Pitch(midi_number=60)
+
+# Instantiation from Pitch Information
 c5_sharp = Pitch(pitch_class=PitchClass.C, accidental=Accidental.SHARP, register=5)
+
+
+# Pitch Information
+print(c5_sharp.frequency)                 # 554.36
+print(c5_sharp.midi_number)               # 73
+print(c5_sharp.register)                  # 5
+print(c5_sharp.pitch_class)               # "C"
+print(c5_sharp.accidental)                # "natural"
+print(c5_sharp.enharmonic_pitch_class)    # "D"
+print(c5_sharp.enharmonic_accidental)     # "flat"
 ```
-When a `Pitch` is created, the details on the `pitch_class`, `accidental`, `register`, `enharmonic_pitch_class`
-and `enharmonic_accidental` are automatically discovered and set on the object if not provided.
+When a `Pitch` is instantiated, the details of it's `pitch_class`, `accidental`, `register`, `enharmonic_pitch_class`
+and `enharmonic_accidental` are automatically inferred and set on the object if not provided. 
+
+The order of what is used to determine the `Pitch` is first the `identifier` (i.e frequency or pitch string), then the `midi_number`, and then combination of `pitch_class`, `accidental` and `register`.
+
+Finally, the format for a pitch string is the [Scientific Pitch Notation](https://en.wikipedia.org/wiki/Scientific_pitch_notation), i.e. the pitch class (e.g. "A", "B", "C", ..., "G") + accidental ("#" or "b" if needed) + register (a non-negative integer)
+
 
 **Functions**
 
