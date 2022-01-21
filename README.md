@@ -90,7 +90,7 @@ print(c5_sharp.frequency)                 # 554.36
 print(c5_sharp.midi_number)               # 73
 print(c5_sharp.register)                  # 5
 print(c5_sharp.pitch_class)               # "C"
-print(c5_sharp.accidental)                # "natural"
+print(c5_sharp.accidental)                # "sharp"
 print(c5_sharp.enharmonic_pitch_class)    # "D"
 print(c5_sharp.enharmonic_accidental)     # "flat"
 ```
