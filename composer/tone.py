@@ -129,6 +129,9 @@ class Tone:
                 # TODO: debug whether this has any effect on output midi file
                 midi.addTempo(track=melody_track, time=time_marker,
                               tempo=note.duration.bpm)
+            else:
+                midi.addTempo(track=melody_track, time=time_marker,
+                              tempo=60)
 
             midi.addNote(track=melody_track,
                          time=time_marker,
