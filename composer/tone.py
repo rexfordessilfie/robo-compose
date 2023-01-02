@@ -1,7 +1,10 @@
 from typing import List, Union
-from notes import Note, Duration, TimeSignature, NoteValue
+from notes import Note, Duration
 from pitches import Pitch
-from utils import filename_timestamp, composer_root_directory
+from utils import composer_root_directory
+from scales import ScaleBuilder
+
+from intervals import EqualTemperament12
 
 from synthesizer import Player, Synthesizer, Waveform, Writer
 import numpy as np
@@ -49,7 +52,7 @@ def midi_out_file_path(filename: str):
 
 class Tone:
     player = Player()
-    synthesizer = Synthesizer(osc1_waveform=Waveform.triangle,
+    synthesizer = Synthesizer(osc1_waveform=Waveform.sine,
                               osc1_volume=1.0, use_osc2=False)
     writer = Writer()
 
@@ -149,12 +152,23 @@ class Tone:
 
 
 if __name__ == '__main__':
-    time_signature = TimeSignature(num_beats=2, note_value=NoteValue.QUARTER)
-    melody = [Note.random(time_signature=time_signature, bpm=60),
-              Note.random(time_signature=time_signature, bpm=80),
-              Note.random(time_signature=time_signature, bpm=120)]
+    # TODO: make sound into a class that we can pitch up and down like frequencies/pitches
+    organ_sound = [Pitch(25),
+                   Pitch(50),
+                   Pitch(100),
+                   Pitch(200),
+                   Pitch(400),
+                   Pitch(800)]
 
-    timestamp = filename_timestamp()
-    Tone.play_melody(melody)
-    Tone.write_midi_melody(f'test{timestamp}.mid', melody)
-    Tone.write_wav_melody(f'test{timestamp}.wav', melody)
+    start_frequency = 25
+    scale_frequencies = ScaleBuilder(interval_list=[1, 2, 2, 2, 2, 2], intervals_relative_to_next=True).build(start_frequency)
+
+    organ_sound2 =  list(map(lambda x: Pitch(x), scale_frequencies))
+
+    organ_progression = [organ_sound2,
+                         map(lambda x: x.frequency * EqualTemperament12.MAJOR_THIRD, organ_sound2),
+                         map(lambda x: x.frequency * EqualTemperament12.PERFECT_FOURTH, organ_sound2),
+                         map(lambda x: x.frequency * EqualTemperament12.PERFECT_FIFTH, organ_sound2)]
+
+    Tone.play_progression(organ_progression, 2)
+
