@@ -42,7 +42,7 @@ def summer_fun_song(bars=2):
 
 
 def random_song(bars=2,
-                mode=ScaleMode.MAJOR,
+                mode=ScaleMode.CHROMATIC,
                 root_frequency=440,
                 num_notes=8):
     key_signature = KeySignature(pitch=Pitch(root_frequency), mode=mode)
