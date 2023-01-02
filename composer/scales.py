@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from enum import Enum
 from intervals import EqualTemperament12, Interval, Temperament
 
@@ -45,7 +45,7 @@ class ChromaticScale(Scale):
 class ScaleBuilder:
     def __init__(
             self,
-            interval_list: List[Interval] = None,
+            interval_list: List[Union[Interval, float]] = None,
             frequency_list: List[int] = None,
             intervals_relative_to_start=False,
             intervals_relative_to_next=False,
