@@ -9,3 +9,6 @@ notebook.ipynb
 scratch.py
 
 out
+
+.DS_Store
+.coverage
