@@ -1,6 +1,6 @@
 from typing import List, Union
 from enum import Enum
-from intervals import EqualTemperament12, Interval, Temperament
+from .intervals import EqualTemperament12, Interval, Temperament
 
 
 class ScaleMode(Enum):

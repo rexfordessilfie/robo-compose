@@ -1,11 +1,11 @@
 import time
-from tone import Tone
-from chords import ChordFactory, ChordQuality
-from intervals import EqualTemperament12, sharpen, flatten
-from pitches import Pitch, KeySignature
-from notes import Note, TimeSignature, NoteValue
-from scales import ScaleMode
-from utils import filename_timestamp
+from .tone import Tone
+from .chords import ChordFactory, ChordQuality
+from .intervals import EqualTemperament12, sharpen, flatten
+from .pitches import Pitch, KeySignature
+from .notes import Note, TimeSignature, NoteValue
+from .scales import ScaleMode
+from .utils import filename_timestamp
 
 
 def rest(duration=0.005):

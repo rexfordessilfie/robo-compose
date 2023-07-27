@@ -2,8 +2,8 @@ import copy
 import math
 import random
 
-from pitches import Pitch, PitchClass, KeySignature
-from utils import random_element
+from .pitches import Pitch, PitchClass, KeySignature
+from .utils import random_element
 
 
 class NoteValue:

@@ -1,10 +1,11 @@
+import time
 from typing import List, Union
-from notes import Note, Duration
-from pitches import Pitch
-from utils import composer_root_directory
-from scales import ScaleBuilder
+from .notes import Note, Duration
+from .pitches import Pitch
+from .utils import composer_root_directory
+from .scales import ScaleBuilder
 
-from intervals import EqualTemperament12
+from .intervals import EqualTemperament12
 
 from synthesizer import Player, Synthesizer, Waveform, Writer
 import numpy as np
@@ -98,6 +99,10 @@ class Tone:
             cls.play_chord(chord, duration)
 
     @classmethod
+    def rest(cls, duration=0.005):
+        time.sleep(duration)
+
+    @classmethod
     def write_wav_melody(cls, filename: str, notes: List[Union[float, Pitch, Note]] = None, duration: float = 1):
         file_path = wav_out_file_path(filename)
         melody_wav = np.concatenate(
@@ -161,9 +166,10 @@ if __name__ == '__main__':
                    Pitch(800)]
 
     start_frequency = 25
-    scale_frequencies = ScaleBuilder(interval_list=[1, 2, 2, 2, 2, 2], intervals_relative_to_next=True).build(start_frequency)
+    scale_frequencies = ScaleBuilder(interval_list=[1, 2, 2, 2, 2, 2], intervals_relative_to_next=True).build(
+        start_frequency)
 
-    organ_sound2 =  list(map(lambda x: Pitch(x), scale_frequencies))
+    organ_sound2 = list(map(lambda x: Pitch(x), scale_frequencies))
 
     organ_progression = [organ_sound2,
                          map(lambda x: x.frequency * EqualTemperament12.MAJOR_THIRD, organ_sound2),
@@ -171,4 +177,3 @@ if __name__ == '__main__':
                          map(lambda x: x.frequency * EqualTemperament12.PERFECT_FIFTH, organ_sound2)]
 
     Tone.play_progression(organ_progression, 2)
-
