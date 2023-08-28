@@ -4,63 +4,47 @@ RoboCompose also contains some utility classes and functions that model musical 
 and allow for musical programming.
 
 This project was inspired by a desire to create musical ideas, and to practice design patterns and OOP in Python.
-I hope to continue to implement more features or ideas as they come.
-Here are some definitions of classes defined and used within the project, and then how they are used.
 
-# Definitions
-The `composer` package contains the following classes:
-* `Pitch`: This is a sound identified by a frequency e.g. `440Hz`, `466Hz`, or
-  by a note name - referred to as "pitch string" - e.g. `"A4"`, `"A4#"`.
-* `Note`: This is a sound identified by a `Pitch` and a `Duration`.
-* `Duration`: This is a length of time identified explicitly by time in seconds,
-  or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
-* `NoteValue`: This is a Western music note value identified by a number (or fraction).
-  Note values include, whole note (1), half note (1/2), quarter note (1/4) etc.
-* `TimeSignature`: This is a Western music time signature identified by a combination of
-  number of beats and the note value of a beat.
-* `Interval`: A number denoting the relative distance between two frequencies. Common intervals in Western
-  Music include, the perfect fifth (3/2), octave (2/1) and more.
-* `Temperament`: This a Western Music tuning system identified by a list of intervals.
-  Examples include equal temperament, and just-intonation.
-* `Scale` (or `Chord`): This is an arbitrary collection of intervals that identify a given scale (or chord).
 
-# Try it Out!
+# Demo
 Follow these steps to try out this project:
 
 1. Clone the repository and then change into the project directory:
-  ```shell
-  $ git clone https://github.com/RexfordEssilfie/robo-compose.git
-  $ cd robo-compose 
-  ```
+    ```shell
+    $ git clone https://github.com/RexfordEssilfie/robo-compose.git
+    $ cd robo-compose 
+    ```
 
 2. Install requirements using:
-  ```shell
-  $ pip install -r requirements.txt
-  ```
-  NB: You will need to install Python 3.9.1 first from [here](https://www.python.org/downloads/).
+    ```shell
+    $ pip install -r requirements.txt
+    ```
+
+    NB: You will need to install Python 3.9.1 first from [here](https://www.python.org/downloads/).
 
 3. Open `composer/songs.py` file, where you will find functions representing songs,
 such as, `random_song()`, `summer_fun_song()` and more.
 
 4. Add a call to the song's function in the main method of the file as follows:
-  ```python
-  # composer/songs.py
+    ```python
+    # composer/songs.py
 
-  def random_song():
-    ...
+    def random_song():
+      ...
 
 
-  if __name__ == "__main__":
-      random_song() # Call the function here!
-      pass
-  ```
-  The `random_song` function will play a randomly generated song, and write midi and wav files to the `out` directory, in case you want
+    if __name__ == "__main__":
+        random_song() # Call the function here!
+        pass
+    ```
+
+     The `random_song` function will play a randomly generated song, and write midi and wav files to the `out` directory, in case you want
   to come back to them for later or open in MuseScore or Logic Pro X for further exploration and development!
 
-5. Run the `composer/songs.py` file to play the song, using the following command:
-  ```shell
-  $ python composer/songs.py
-  ```
+6. Run the `composer/songs.py` file to play the song, using the following command:
+    ```shell
+    $ python composer/songs.py
+    ```
 
 
 
@@ -212,6 +196,22 @@ Tone.write_wav_melody("my_melody.wav", melody)
 Tone.write_midi_melody("my_melody.mid", melody)
 ```
 
+# Definitions
+The `composer` package contains the following classes:
+* `Pitch`: This is a sound identified by a frequency e.g. `440Hz`, `466Hz`, or
+  by a note name - referred to as "pitch string" - e.g. `"A4"`, `"A4#"`.
+* `Note`: This is a sound identified by a `Pitch` and a `Duration`.
+* `Duration`: This is a length of time identified explicitly by time in seconds,
+  or relatively by a combination of a `NoteValue`, bpm, and a `TimeSignature`.
+* `NoteValue`: This is a Western music note value identified by a number (or fraction).
+  Note values include, whole note (1), half note (1/2), quarter note (1/4) etc.
+* `TimeSignature`: This is a Western music time signature identified by a combination of
+  number of beats and the note value of a beat.
+* `Interval`: A number denoting the relative distance between two frequencies. Common intervals in Western
+  Music include, the perfect fifth (3/2), octave (2/1) and more.
+* `Temperament`: This a Western Music tuning system identified by a list of intervals.
+  Examples include equal temperament, and just-intonation.
+* `Scale` (or `Chord`): This is an arbitrary collection of intervals that identify a given scale (or chord).
 
 # Future Work
 I plan on working on some more features to add to this project to make it more useful for composition and musical programming. Some ideas include:
